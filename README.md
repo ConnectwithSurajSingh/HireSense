@@ -105,7 +105,7 @@ Set `SECRET_KEY` and `ADMIN_PASSWORD` in `.env` before any non-local deployment.
 docker compose up --build
 ```
 
-This starts PostgreSQL 15 on port `5432` and three Flask instances on ports `5010`, `5011`, `5012`. The admin user is created automatically on first boot — no manual seeding required.
+This starts PostgreSQL 15 on host port `5434` (container port `5432`) and three Flask instances on ports `5010`, `5011`, `5012`. The admin user is created automatically on first boot — no manual seeding required.
 
 **4. Open a portal and log in**
 
