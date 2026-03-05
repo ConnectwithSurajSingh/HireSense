@@ -23,12 +23,12 @@
                         d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
                     </path>
                 </svg>
-                <h1 class="text-3xl font-bold">HireSense</h1>
+                <h1 class="text-2xl font-bold">HireSense</h1>
             </div>
-            <p class="text-6xl text-white font-extrabold mt-10">Find the right talent,
-            <p class="text-6xl text-green-600 font-extrabold">faster than ever.</p>
+            <p class="text-5xl text-white font-extrabold mt-10">Find the right talent,
+            <p class="text-5xl text-green-600 font-extrabold">faster than ever.</p>
             </p>
-            <p class="text-md md:text-xl text-green-200 mt-10">
+            <p class="text-sm md:text-lg text-green-200 mt-10">
                 Experience a smarter approach to career development with HireSense, where intelligent analysis meets
                 seamless project management. Our platform provides professionals with precise skill gap analytics and
                 personalized learning paths to ensure every transition is backed by actionable data. Securely sign in to
@@ -36,22 +36,36 @@
             </p>
         </div>
         <!-- Right Half -->
-        <div class="flex flex-col justify-center items-center relative px-20 py-10 bg-white h-screen w-full">
-            <h1 class="text-5xl text-black font-bold tracking-tighter">Sign In</h1>
+        <div class="flex flex-col justify-center items-center relative px-32 py-12 bg-white h-screen w-full text-left">
+            <h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Sign In</h1>
 
-            <form method="POST" class="my-10">
-                <label class="text-2xl font-bold">Email Address</label><br>
-                <input name="username" type="text" placeholder="name@company.com" required autofocus
-                    class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5"><br>
-                <label class="text-2xl font-bold">Password</label><br>
-                <input name="password" type="password" placeholder="Password" required
-                    class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5"><br>
-                <a href="#" class="text-md text-green-800 hover:underline">Forgot Password?</a><br>
-                <button type="submit" class="text-2xl w-full py-2 my-5 rounded-md bg-green-950 text-white font-bold hover:bg-green-700">Sign
-                    In</button>
-                <span class="text-md">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-md text-green-800 hover:underline">Register Now</a></span>
+            <form method="POST" class="w-full max-w-md">
+                <div class="mb-6">
+                    <label class="text-xl font-bold block mb-2">Email Address</label>
+                    <input name="username" type="text" placeholder="name@company.com" required autofocus
+                        class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="text-xl font-bold block mb-2">Password</label>
+                    <input name="password" type="password" placeholder="Password" required
+                        class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+                </div>
+
+                <div class="flex justify-between items-center mb-8">
+                    <a href="#" class="text-sm text-green-800 hover:underline">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
+                    Sign In
+                </button>
+                
+                <p class="text-center">
+                    <span class="text-sm text-gray-600">Don't have an account? </span>
+                    <a href="{{ url_for('auth.register') }}" class="text-sm text-green-800 font-semibold hover:underline">Register Now</a>
+                </p>
             </form>
-            <div class="flex justify-center items-center absolute bottom-0 self-center mb-20 gap-10 text-sm text-gray-400">
+            <div class="flex justify-center items-center absolute bottom-0 self-center mb-10 gap-8 text-xs text-gray-400">
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Service</a>
                 <a href="#">Support</a>
