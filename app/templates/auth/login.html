@@ -1,77 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-</head>
+{% block title %} – Login{% endblock %}
 
-<body class="font-[roboto]">
-    <div class="grid grid-cols-2">
-        <!-- left Half -->
-        <div class="flex flex-col px-20 py-10 bg-green-950 h-screen w-full">
-            <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 mb-10 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                    class="w-10 p-2 rounded-xl fill-current bg-green-700">
-                    <path
-                        d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
-                    </path>
-                </svg>
-                <h1 class="text-2xl font-bold">HireSense</h1>
-            </div>
-            <p class="text-5xl text-white font-extrabold mt-10">Find the right talent,
-            <p class="text-5xl text-green-600 font-extrabold">faster than ever.</p>
-            </p>
-            <p class="text-sm md:text-lg text-green-200 mt-10">
-                Experience a smarter approach to career development with HireSense, where intelligent analysis meets
-                seamless project management. Our platform provides professionals with precise skill gap analytics and
-                personalized learning paths to ensure every transition is backed by actionable data. Securely sign in to
-                your dashboard to streamline your workflow and navigate your professional growth with precision.
-            </p>
+{% block body_class %}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+    <!-- left Half -->
+    <div class="flex flex-col px-20 py-10 bg-green-950 h-screen w-full">
+        <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 mb-10 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                class="w-10 p-2 rounded-xl fill-current bg-green-700">
+                <path
+                    d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
+                </path>
+            </svg>
+            <h1 class="text-2xl font-bold">HireSense</h1>
         </div>
-        <!-- Right Half -->
-        <div class="flex flex-col justify-center items-center relative px-32 py-12 bg-white h-screen w-full text-left">
-            <h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Sign In</h1>
+        <p class="text-5xl text-white font-extrabold mt-10">Find the right talent,
+        <p class="text-5xl text-green-600 font-extrabold">faster than ever.</p>
+        </p>
+        <p class="text-sm md:text-lg text-green-200 mt-10">
+            Experience a smarter approach to career development with HireSense, where intelligent analysis meets
+            seamless project management. Our platform provides professionals with precise skill gap analytics and
+            personalized learning paths to ensure every transition is backed by actionable data. Securely sign in to
+            your dashboard to streamline your workflow and navigate your professional growth with precision.
+        </p>
+    </div>
+    <!-- Right Half -->
+    <div class="flex flex-col justify-center items-center relative px-32 py-12 bg-white h-screen w-full text-left">
+        <h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Sign In</h1>
 
-            <form method="POST" class="w-full max-w-md">
-                <div class="mb-6">
-                    <label class="text-xl font-bold block mb-2">Email Address</label>
-                    <input name="username" type="text" placeholder="name@company.com" required autofocus
-                        class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="text-xl font-bold block mb-2">Password</label>
-                    <input name="password" type="password" placeholder="Password" required
-                        class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
-                </div>
-
-                <div class="flex justify-between items-center mb-8">
-                    <a href="#" class="text-sm text-green-800 hover:underline">Forgot Password?</a>
-                </div>
-
-                <button type="submit" class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
-                    Sign In
-                </button>
-                
-                <p class="text-center">
-                    <span class="text-sm text-gray-600">Don't have an account? </span>
-                    <a href="{{ url_for('auth.register') }}" class="text-sm text-green-800 font-semibold hover:underline">Register Now</a>
-                </p>
-            </form>
-            <div class="flex justify-center items-center absolute bottom-0 self-center mb-10 gap-8 text-xs text-gray-400">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Support</a>
+        <form method="POST" class="w-full max-w-md">
+            <div class="mb-6">
+                <label class="text-xl font-bold block mb-2">Email Address</label>
+                <input name="username" type="text" placeholder="someone@example.com" required autofocus
+                    class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
             </div>
+            
+            <div class="mb-4">
+                <label class="text-xl font-bold block mb-2">Password</label>
+                <input name="password" type="password" placeholder="Password" required
+                    class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+            </div>
+
+            <div class="flex justify-between items-center mb-8">
+                <a href="#" class="text-sm text-green-800 hover:underline">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
+                Sign In
+            </button>
+            
+            <p class="text-center">
+                <span class="text-sm text-gray-600">Don't have an account? </span>
+                <a href="{{ url_for('auth.register') }}" class="text-sm text-green-800 font-semibold hover:underline">Register Now</a>
+            </p>
+        </form>
+        <div class="flex justify-center items-center absolute bottom-0 self-center mb-10 gap-8 text-xs text-gray-400">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Support</a>
         </div>
     </div>
-</body>
-
-</html>
+</div>
+{% endblock %}

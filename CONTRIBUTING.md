@@ -39,7 +39,38 @@ Thank you for your interest in contributing to HireSense. This document covers t
    git remote add upstream https://github.com/paarthsiloiya/HireSense.git
    ```
 
-2. **Create and activate a virtual environment**
+2. **Set environment variables**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env — set DATABASE_URL, SECRET_KEY, ADMIN_PASSWORD
+   ```
+
+3. **Start with live reload (recommended)**
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+   ```
+
+   This mounts your local source into the containers and enables Flask's debug server. After the first build you can drop `--build` for subsequent starts:
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+   ```
+
+   | Change type | What to do |
+   |-------------|------------|
+   | HTML / Tailwind classes | Refresh the browser |
+   | Python (`.py`) files | Flask auto-restarts — refresh after a moment |
+   | `requirements.txt` | Restart with `--build` |
+
+4. **Register test users**
+
+   Visit `http://localhost:5010/auth/register` to create `manager` or `employee` accounts. The `admin` account is pre-seeded only — it cannot be registered.
+
+### Alternative: Local Virtual Environment (no Docker)
+
+1. Create and activate a virtual environment
 
    ```bash
    # Windows
@@ -51,20 +82,13 @@ Thank you for your interest in contributing to HireSense. This document covers t
    source .venv/bin/activate
    ```
 
-3. **Install dependencies**
+2. Install dependencies
 
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Set environment variables**
-
-   ```bash
-   cp .env.example .env
-   # Edit .env — set DATABASE_URL, SECRET_KEY, ADMIN_PASSWORD
-   ```
-
-5. **Run a portal**
+3. Run a portal
 
    ```bash
    # macOS / Linux
@@ -74,11 +98,15 @@ Thank you for your interest in contributing to HireSense. This document covers t
    $env:PORT=5010; python run.py
    ```
 
-   On first run, all database tables are created and the `admin` user is seeded automatically. No separate seed script is needed.
+   On first run, all database tables are created and the `admin` user is seeded automatically.
 
-6. **Register test users**
+### Frontend Styling
 
-   Visit `http://localhost:5010/auth/register` to create `manager` or `employee` accounts. The `admin` account is pre-seeded only — it cannot be registered.
+All templates extend `app/templates/base.html`. Tailwind CSS v4 is loaded via the `@tailwindcss/browser` CDN — there is no Node.js toolchain, no compilation step, and no CSS files to maintain. To style a page:
+
+- Add Tailwind utility classes directly in any template HTML.
+- For project-wide theme changes (custom fonts, colours), edit the `<style type="text/tailwindcss">` block inside `base.html`.
+- Refresh the browser — changes are visible immediately (no rebuild required when using `docker-compose.dev.yml`).
 
 ---
 

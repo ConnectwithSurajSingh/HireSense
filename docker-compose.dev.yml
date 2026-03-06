@@ -1,0 +1,38 @@
+# =============================================================
+# HireSense – Development override
+# =============================================================
+# Mounts your local source into the containers so that any
+# change to a template or Python file is picked up immediately
+# without rebuilding the image.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# First time (or after requirements.txt changes), add --build:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+#
+# How live-reload works:
+#   - Templates (HTML/CSS): Flask/Jinja2 reads from disk on every request.
+#     Just refresh the browser to see HTML/style changes.
+#   - Python files: Flask debug server auto-restarts when .py files change.
+#   - No rebuild needed for either.
+# =============================================================
+
+services:
+  app_5010:
+    volumes:
+      - .:/app
+    environment:
+      FLASK_DEBUG: "true"
+
+  app_5011:
+    volumes:
+      - .:/app
+    environment:
+      FLASK_DEBUG: "true"
+
+  app_5012:
+    volumes:
+      - .:/app
+    environment:
+      FLASK_DEBUG: "true"

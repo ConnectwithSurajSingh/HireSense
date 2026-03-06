@@ -47,6 +47,7 @@ Built for campus placement drives, HR teams, and working professionals, HireSens
 - Flask, Flask-SQLAlchemy, Flask-Login, Flask-Migrate
 - PostgreSQL 15
 - Docker & Docker Compose
+- Tailwind CSS v4 (via `@tailwindcss/browser` CDN — no build step)
 - Transformer models (BERT), spaCy, HuggingFace, NLTK
 - Pgvector (planned)
 
@@ -69,6 +70,20 @@ Three roles: **admin**, **manager**, **employee**.
 | 5012 | http://localhost:5012 | `hs_session_5012` |
 
 Logging in on port 5010 does not affect sessions on 5011 or 5012.
+
+---
+
+## Frontend Styling
+
+All templates extend `app/templates/base.html`, which loads Tailwind CSS directly in the browser via the official CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+```
+
+A `<style type="text/tailwindcss">` block inside `base.html` holds any project-wide theme configuration (custom fonts, colours, etc.). No Node.js, no build step, and no compiled CSS files are required — edit a template and refresh the browser.
+
+> **Note:** The browser CDN is optimised for development. When the project moves toward production, replace it with the Tailwind CLI build step to ship a minimised CSS bundle.
 
 ---
 
@@ -135,7 +150,39 @@ docker compose logs -f app_5010
 
 ---
 
-### Option B — Local Virtual Environment
+### Option B — Docker Dev Mode (live reload)
+
+Use this while actively developing. Your local source tree is mounted into the containers so template and Python changes are reflected immediately — no rebuild needed.
+
+**1. Start all services with the dev override**
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+```
+
+First time, or after changing `requirements.txt`, add `--build`:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+```
+
+**2. See your changes**
+
+| Change type | What to do |
+|-------------|------------|
+| HTML / Tailwind classes | Refresh the browser |
+| Python (`.py`) files | Flask debug server auto-restarts — refresh after a moment |
+| `requirements.txt` | Restart with `--build` |
+
+**3. Stop**
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+```
+
+---
+
+### Option C — Local Virtual Environment
 
 **1. Clone and enter the repository**
 
