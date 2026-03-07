@@ -1,121 +1,55 @@
-{% extends "base.html" %}
+{% extends "auth/auth_base.html" %}
 
 {% block title %} – Register{% endblock %}
 
-{% block body_class %}{% endblock %}
+{% block auth_content %}
+<h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Register</h1>
 
-{% block content %}
-<div class="grid grid-cols-2">
-  <!-- left Half -->
-  <div class="flex flex-col px-20 py-10 bg-green-950 h-screen w-full">
-    <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 mb-10 text-white">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 p-2 rounded-xl fill-current bg-green-700">
-        <path
-          d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
-        </path>
-      </svg>
-      <h1 class="text-2xl font-bold">HireSense</h1>
-    </div>
-    <p class="text-5xl text-white font-extrabold mt-10">Find the right talent,
-    <p class="text-5xl text-green-600 font-extrabold">faster than ever.</p>
-    </p>
-    <p class="text-sm md:text-lg text-green-200 mt-10">
-      Experience a smarter approach to career development with HireSense, where intelligent analysis meets
-      seamless project management. Our platform provides professionals with precise skill gap analytics and
-      personalized learning paths to ensure every transition is backed by actionable data. Securely sign in to
-      your dashboard to streamline your workflow and navigate your professional growth with precision.
-    </p>
+<form method="POST" class="w-full max-w-md">
+  <div class="mb-6">
+    <label class="text-xl font-bold block mb-2">Username</label>
+    <input name="username" type="text" placeholder="Username" required
+      class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
   </div>
-  <!-- Right Half -->
-  <div class="flex flex-col justify-center items-center relative px-32 py-12 bg-white h-screen w-full text-left">
-    <h1 class="text-4xl text-black font-bold tracking-tighter mb-8 text-left">Register</h1>
 
-    <form method="POST" class="w-full max-w-md">
-      <div class="mb-6">
-        <label class="text-xl font-bold block mb-2">Username</label>
-        <input name="username" type="text" placeholder="Username" required
-          class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+  <div class="mb-4">
+    <label class="text-xl font-bold block mb-2">Email Address</label>
+    <input name="email" type="email" placeholder="name@company.com" required
+      class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+  </div>
+
+  <div class="mb-6">
+    <label class="text-xl font-bold block mb-2">Password</label>
+    <input name="password" type="password" placeholder="Password" required
+      class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
+  </div>
+
+  <div class="mb-8">
+    <div class="flex items-center gap-4">
+      <span class="text-xl font-bold">Role</span>
+      <div class="flex gap-2">
+        <input type="radio" name="role" id="role_manager" value="manager" class="sr-only peer/manager" checked>
+        <label for="role_manager"
+          class="px-5 py-2 rounded-full border-2 border-green-950 text-green-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/manager:bg-green-950 peer-checked/manager:text-white hover:bg-green-100 peer-checked/manager:hover:bg-green-900">
+          Manager
+        </label>
+        <input type="radio" name="role" id="role_employee" value="employee" class="sr-only peer/employee">
+        <label for="role_employee"
+          class="px-5 py-2 rounded-full border-2 border-green-950 text-green-950 font-semibold cursor-pointer select-none transition-all duration-200 peer-checked/employee:bg-green-950 peer-checked/employee:text-white hover:bg-green-100 peer-checked/employee:hover:bg-green-900">
+          Employee
+        </label>
       </div>
-
-      <div class="mb-4">
-        <label class="text-xl font-bold block mb-2">Email Address</label>
-        <input name="email" type="email" placeholder="name@comapny.com" required
-          class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
-      </div>
-
-      <div class="mb-4">
-        <label class="text-xl font-bold block mb-2">Password</label>
-        <input name="password" type="password" placeholder="Password" required
-          class="text-xl w-full px-4 py-3 rounded-md border border-gray-300 focus:border-green-800 outline-none transition-colors">
-      </div>
-
-      <div class="mb-4">
-        <p>
-          <label class="text-2xl font-bold">Role</label><br>
-          <select name="role" class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5">
-            <option value="manager">Manager</option>
-            <option value="employee">Employee</option>
-          </select>
-        </p>
-      </div>
-
-      <button type="submit"
-        class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
-        Register
-      </button>
-
-      <p class="text-center">
-        <span class="text-sm text-gray-600">Already have an account? </span>
-        <a href="{{ url_for('auth.login') }}" class="text-sm text-green-800 font-semibold hover:underline">Log In</a>
-      </p>
-    </form>
-    <div class="flex justify-center items-center absolute bottom-0 self-center mb-20 gap-10 text-sm text-gray-400">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Support</a>
     </div>
   </div>
-</div>
-{% endblock %}
-<!-- 
-
-{% block page_title %}
-Register
-{% endblock %}
-
-{% block form_content %}
-<h1 class="text-5xl text-black font-bold tracking-tighter">Register</h1>
-
-<form method="POST" class="my-10">
-  <label class="text-2xl font-bold">Username</label><br>
-  <input name="username" type="text" placeholder="username" required
-    class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5"><br>
-
-  <label class="text-2xl font-bold">Email</label><br>
-  <input name="email" type="email" placeholder="name@company.com" required
-    class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5"><br>
-
-  <label class="text-2xl font-bold">Password</label><br>
-  <input name="password" type="password" placeholder="Password" required
-    class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5"><br>
-
-  <p>
-    <label class="text-2xl font-bold">Role</label><br>
-    <select name="role" class="text-2xl w-full px-2 py-1 rounded-md border border-gray-400 mt-2 mb-5">
-      <option value="manager">Manager</option>
-      <option value="employee">Employee</option>
-    </select>
-  </p>
 
   <button type="submit"
-    class="text-2xl w-full py-2 my-5 rounded-md bg-green-950 text-white font-bold hover:bg-green-700">Sign
-    In</button>
-  <span class="text-md">Already have an account? <a href="{{ url_for('auth.login') }}"
-      class="text-md text-green-800 hover:underline">Register</a></span>
+    class="text-xl w-full py-3 mb-6 rounded-md bg-green-950 text-white font-bold hover:bg-green-700 transition-colors shadow-sm">
+    Register
+  </button>
+
+  <p class="text-center">
+    <span class="text-sm text-gray-600">Already have an account? </span>
+    <a href="{{ url_for('auth.login') }}" class="text-sm text-green-800 font-semibold hover:underline">Log In</a>
+  </p>
 </form>
-<div class="flex justify-center items-center absolute bottom-0 self-center mb-20 gap-10 text-sm text-gray-400">
-  <a href="#">Privacy Policy</a>
-  <a href="#">Terms of Service</a>
-  <a href="#">Support</a>
-</div>
-{% endblock %} -->
+{% endblock %}

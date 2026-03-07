@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block body_class %}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2">
+  <!-- Left Half -->
+  <div class="flex flex-col px-20 py-10 bg-green-950 h-screen w-full">
+    <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 mb-10 text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 p-2 rounded-xl fill-current bg-green-700">
+        <path
+          d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
+        </path>
+      </svg>
+      <h1 class="text-2xl font-bold">HireSense</h1>
+    </div>
+    <p class="text-5xl text-white font-extrabold mt-10">Find the right talent,
+    <p class="text-5xl text-green-600 font-extrabold">faster than ever.</p>
+    </p>
+    <p class="text-sm md:text-lg text-green-200 mt-10">
+      Experience a smarter approach to career development with HireSense, where intelligent analysis meets
+      seamless project management. Our platform provides professionals with precise skill gap analytics and
+      personalized learning paths to ensure every transition is backed by actionable data. Securely sign in to
+      your dashboard to streamline your workflow and navigate your professional growth with precision.
+    </p>
+  </div>
+
+  <!-- Right Half -->
+  <div class="flex flex-col justify-center items-center relative px-32 py-12 bg-white h-screen w-full text-left">
+
+    {% block auth_content %}{% endblock %}
+
+    <div class="flex justify-center items-center absolute bottom-0 self-center mb-4 gap-8 text-xs text-gray-400">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Support</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
