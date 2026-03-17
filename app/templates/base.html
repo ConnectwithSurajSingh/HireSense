@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,35 +19,37 @@
   <!-- Google Fonts – Roboto -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
 
   {% block head_extra %}{% endblock %}
 </head>
-<body class="font-sans antialiased text-gray-900 bg-gray-50 {% block body_class %}{% endblock %}">
-  {% if current_user.is_authenticated %}
-  <div class="px-6 py-4 bg-white shadow-sm flex justify-between items-center mb-6">
-    <div class="font-bold text-xl text-green-800">HireSense</div>
-    <div class="text-sm text-gray-600">
-      <span class="mr-4">Hello, <b>{{ current_user.username }}</b> ({{ current_user.role }})</span>
-      <a href="{{ url_for('auth.logout') }}" class="text-red-600 hover:underline font-medium">Logout</a>
-    </div>
-  </div>
-  {% endif %}
+
+<body class="font-sans antialiased text-gray-900 bg-gray-100 {% block body_class %}{% endblock %}">
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 w-full max-w-md px-4">
-        {% for category, message in messages %}
-          {% set alertColor = 'bg-red-50 text-red-800 border-red-200' if category == 'danger' else ('bg-green-50 text-green-800 border-green-200' if category == 'success' else 'bg-blue-50 text-blue-800 border-blue-200') %}
-          <div class="px-4 py-3 rounded-lg border shadow-lg {{ alertColor }} flex items-center justify-between" role="alert">
-            <span class="font-medium">{{ message }}</span>
-            <button onclick="this.parentElement.remove()" class="opacity-60 hover:opacity-100 text-lg leading-none focus:outline-none ml-4">&times;</button>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  {% if messages %}
+  <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 w-full max-w-md px-4">
+    {% for category, message in messages %}
+    {% set alertColor = 'bg-red-50 text-red-800 border-red-200' if category == 'danger' else ('bg-green-50
+    text-green-800 border-green-200' if category == 'success' else 'bg-blue-50 text-blue-800 border-blue-200') %}
+    <div class="px-4 py-3 rounded-lg border shadow-lg {{ alertColor }} flex items-center justify-between" role="alert">
+      <span class="font-medium">{{ message }}</span>
+      <button onclick="this.parentElement.remove()"
+        class="opacity-60 hover:opacity-100 text-lg leading-none focus:outline-none ml-4">&times;</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
   {% endwith %}
 
   {% block content %}{% endblock %}
 </body>
+
 </html>

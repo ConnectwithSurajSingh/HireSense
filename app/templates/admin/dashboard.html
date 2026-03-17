@@ -2,45 +2,289 @@
 {% block title %} – Admin Dashboard{% endblock %}
 
 {% block admin_content %}
-<h1>Admin Dashboard</h1>
-<p>Welcome, {{ current_user.username }}.</p>
+<div class="ml-70 px-5">
+    <!-- Parent Bento Grid container -->
+    <!-- Child Grids for widgets -->
+    <!--  -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="col-span-3 grid grid-cols-4 gap-6">
+            <!-- Total Professionals -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="p-2 bg-emerald-100 text-green-700 rounded-xl">
+                        <span class="material-symbols-outlined">group</span>
+                    </span>
+                </div>
+                <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Total Professionals</p>
+                <p class="text-2xl font-bold mt-1 text-gray-900">{{ total_users }}</p>
+            </div>
 
-<h2>Pending Account Approvals</h2>
-{% if pending_users %}
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Created</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in pending_users %}
-        <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-            <td>
-                <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}"
-                    style="display:inline;">
-                    <button type="submit">Approve</button>
-                </form>
-                <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}"
-                    style="display:inline;">
-                    <button type="submit">Reject</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No pending approvals.</p>
-{% endif %}
+            <!-- Pending Approvals -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="p-2 bg-emerald-100 text-green-700 rounded-xl">
+                        <span class="material-symbols-outlined">pending_actions</span>
+                    </span>
+                </div>
+                <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Pending Approvals</p>
+                <p class="text-2xl font-bold mt-1 text-gray-900">{{ pending_users|length }}</p>
+            </div>
+
+            <!-- Skill Gaps Identified -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="p-2 bg-emerald-100 text-green-700 rounded-xl">
+                        <span class="material-symbols-outlined">analytics</span>
+                    </span>
+                </div>
+                <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Skill Gaps Identified</p>
+                <p class="text-2xl font-bold mt-1 text-gray-900">3,204</p>
+            </div>
+
+            <!-- Active Projects -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="p-2 bg-emerald-100 text-green-700 rounded-xl">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                    </span>
+                </div>
+                <p class="text-gray-500 text-xs font-medium uppercase tracking-wider">Active Projects</p>
+                <p class="text-2xl font-bold mt-1 text-gray-900">892</p>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
+        <div class="xl:col-span-2 space-y-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900">Pending Requests</h3>
+                </div>
+
+                <div class="overflow-x-auto overflow-y-auto max-h-70">
+                    {% if pending_users %}
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 z-10">
+                            <tr class="bg-gray-50 text-sm uppercase text-gray-500 tracking-widest font-bold">
+                                <th class="px-6 py-3">ID</th>
+                                <th class="px-6 py-3">Username</th>
+                                <th class="px-6 py-3">Email</th>
+                                <th class="px-6 py-3">Created</th>
+                                <th class="px-6 py-3">Role</th>
+                                <th class="px-6 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-white">
+                            {% for user in pending_users %}
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-4 text-xs text-gray-500">{{ user.id }}</td>
+                                <td class="px-6 py-4 font-medium text-sm text-gray-900">{{ (user.username).title() }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">
+                                    <a href="mailto:{{ user.email }}" class="hover:underline">
+                                        {{ user.email }}
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500">{{ user.created_at.strftime('%Y-%m-%d
+                                    (%H:%M)') }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    <div class="w-fit px-2 py-1 rounded-xl 
+                                    {% if user.role =='manager' %} 
+                                    bg-blue-50 text-blue-600 border border-blue-600 
+                                    {% else %} 
+                                    bg-yellow-50 text-yellow-600 border border-yellow-600
+                                    {% endif %}
+                                    ">
+                                        {{ (user.role).title() }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-left">
+                                    <div class="flex items-center space-x-2">
+                                        <form method="POST"
+                                            action="{{ url_for('admin.approve_user', user_id=user.id) }}"
+                                            style="display:inline;">
+                                            <button
+                                                class="text-sm px-3 py-1.5 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-shadow">Approve</button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('admin.reject_user', user_id=user.id) }}"
+                                            style="display:inline;">
+                                            <button
+                                                class="text-sm px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-shadow">Deny</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="p-6 text-center text-gray-500 text-sm">
+                        No pending approvals.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Widgets -->
+        <div class="space-y-6 row-span-2">
+            <!-- Security Widget -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-6 bg-gray-50 border-b border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-rose-600">shield_with_heart</span>
+                        <h3 class="font-bold text-gray-900">Suspicious Activity</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">High-risk intervention required</p>
+                </div>
+
+                <div class="p-4 space-y-4 overflow-y-auto max-h-80 bg-white">
+                    <div class="p-4 bg-rose-50/30 rounded-xl border border-rose-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">CRITICAL</span>
+                            <span class="text-[10px] text-gray-400">2m ago</span>
+                        </div>
+                        <p class="text-sm font-mono text-gray-900 font-bold">192.168.1.104</p>
+                        <p class="text-xs text-gray-600 mt-1">Multiple failed admin logins detected from Frankfurt, DE
+                        </p>
+                        <button
+                            class="w-full mt-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
+                            Block IP Address
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-amber-50/30 rounded-xl border border-amber-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">WARNING</span>
+                            <span class="text-[10px] text-gray-400">15m ago</span>
+                        </div>
+                        <p class="text-sm font-mono text-gray-900 font-bold">45.76.21.90</p>
+                        <p class="text-xs text-gray-600 mt-1">Rapid API scraping attempt on /resume-analysis endpoint
+                        </p>
+                        <button
+                            class="w-full mt-4 py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-lg transition-colors">
+                            Review Logs
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <span
+                                class="text-[10px] font-bold text-gray-700 bg-gray-200 px-2 py-0.5 rounded">INFO</span>
+                            <span class="text-[10px] text-gray-400">1h ago</span>
+                        </div>
+                        <p class="text-sm font-mono text-gray-900 font-bold">System</p>
+                        <p class="text-xs text-gray-600 mt-1">New admin user created: avneesh_admin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Model Status -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <h3 class="text-sm font-bold mb-4 text-gray-900">AI Model Status</h3>
+
+                <div class="space-y-4 overflow-y-auto max-h-60 pr-1">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500 font-medium">NLP Accuracy</span>
+                            <span class="font-bold text-gray-900">98.4%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-full w-[98.4%]"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500 font-medium">Inference Latency</span>
+                            <span class="font-bold text-gray-900">24ms</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-full w-[15%]"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500 font-medium">Memory Usage</span>
+                            <span class="font-bold text-gray-900">64%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-amber-500 h-full w-[64%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Lifecycle List -->
+        <div class="bg-white rounded-xl col-span-2 border border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-gray-900">User Lifecycle</h3>
+                <div class="flex gap-2">
+                    <button class="p-2 bg-gray-50 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                        <span class="material-symbols-outlined text-sm">filter_list</span>
+                    </button>
+                    <button class="p-2 bg-gray-50 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                        <span class="material-symbols-outlined text-sm">search</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 space-y-3 overflow-y-auto max-h-80 bg-white">
+                <div
+                    class="flex items-center gap-4 p-4 bg-gray-50/50 rounded-xl group hover:shadow-md transition-all border border-transparent hover:border-gray-100">
+                    <div class="size-10 rounded-full bg-gray-200 flex-shrink-0"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCunowD7BnPZQOTqYG9zkYIwK85_KWNpQ_3MIA1qnnnUf0heYHXT-g9N00VwsVb_o4MBYXWvkoyqEGvo5Cvglbvh6OZjjqbUguwm2Esk80eSVrPy540tZ5axtXhRc0HWghFIOhexXA9DgpLcLm-AG43XzWVojILS7yvlKqRQj1wMdTFE44zoBVCNG7mmDn4M0XZthcxi5ViuIHBodF6TN7Ig4CnCBmwPIbft6LXK_MqvU2ILv7gLg-Plp2CBrMxdOcrzVBRCgt2xPQ'); background-size: cover;">
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-gray-900">Elena Gilbert</p>
+                        <p class="text-[10px] text-gray-500">Active for 14 months • 82% Engagement Score</p>
+                    </div>
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="p-2 bg-white rounded-lg text-blue-600 border border-gray-100 hover:shadow-sm"
+                            title="Edit">
+                            <span class="material-symbols-outlined text-sm">edit</span>
+                        </button>
+                        <button class="p-2 bg-white rounded-lg text-rose-500 border border-gray-100 hover:shadow-sm"
+                            title="Blacklist">
+                            <span class="material-symbols-outlined text-sm">block</span>
+                        </button>
+                        <button class="p-2 bg-white rounded-lg text-gray-500 border border-gray-100 hover:shadow-sm"
+                            title="Reset">
+                            <span class="material-symbols-outlined text-sm">refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    class="flex items-center gap-4 p-4 bg-gray-50/50 rounded-xl group hover:shadow-md transition-all border border-transparent hover:border-gray-100">
+                    <div class="size-10 rounded-full bg-gray-200 flex-shrink-0"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCktt18ZqifWI77MCIEpJFxXemXHKse1-1y3bJSvUoFIwC7dzBw3p2g4SH4MvhfwBTucTgcTVM9TlUPVE33wdn_t0a2D5Vk-YRSg408zMx6sS2Fa6Rsp1QV7rN2lnO9ziJV1Y9KYTZVocoJAI0A4DZvVMk6GWCjWdIMETn-1w9iCiRT8vA9UiCq2L8fQueXIt23eGgw0ygjme8uZmq1EZfk_XzYZBlCz5IOsUvpwl-WZouIN0gaZom5Ewf0-11t3EOOno-zMkcpGLI'); background-size: cover;">
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-gray-900">Marcus Holloway</p>
+                        <p class="text-[10px] text-gray-500">Active for 3 months • 95% Skill Match Rate</p>
+                    </div>
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="p-2 bg-white rounded-lg text-blue-600 border border-gray-100 hover:shadow-sm"
+                            title="Edit">
+                            <span class="material-symbols-outlined text-sm">edit</span>
+                        </button>
+                        <button class="p-2 bg-white rounded-lg text-rose-500 border border-gray-100 hover:shadow-sm"
+                            title="Blacklist">
+                            <span class="material-symbols-outlined text-sm">block</span>
+                        </button>
+                        <button class="p-2 bg-white rounded-lg text-gray-500 border border-gray-100 hover:shadow-sm"
+                            title="Reset">
+                            <span class="material-symbols-outlined text-sm">refresh</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 {% endblock %}

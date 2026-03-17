@@ -1,14 +1,117 @@
 {% extends "base.html" %}
 
 {% block content %}
-<nav>
-    <ul>
-        <li><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('admin.manage_users') }}">Manage Users</a></li>
-        <li><a href="{{ url_for('admin.reset_credentials') }}">Reset Credentials</a></li>
-        <li><a href="{{ url_for('admin.blacklisted_users') }}">Blacklisted Users</a></li>
-    </ul>
-</nav>
-<hr>
+<aside class="fixed top-0 left-0 bg-green-950 w-70 h-screen">
+    <div class="flex flex-col text-white p-6">
+        <div class="grid grid-cols-[auto_1fr] items-center gap-x-4 mb-10 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                class="w-10 p-2 rounded-xl fill-current bg-green-700">
+                <path
+                    d="M1 11C6.52285 11 11 6.52285 11 1H13C13 6.52285 17.4772 11 23 11V13C17.4772 13 13 17.4772 13 23H11C11 17.4772 6.52285 13 1 13V11Z">
+                </path>
+            </svg>
+            <h1 class="text-3xl font-bold">HireSense</h1>
+        </div>
+        <div class="flex flex-col text-lg">
+            <a href="{{ url_for('admin.dashboard') }}" class="font-bold font-sans pl-3 py-4 my-2 rounded-full border-green-500 
+                hover:bg-green-900 hover:border-l-6 hover:text-green-500 transition-all ease-in-out
+                {% if active_page == 'Dashboard' %} bg-green-900 border-l-6 text-green-500 {% endif %}">
+                Dashboard</a>
+            <a href="{{ url_for('admin.blacklisted_users') }}" class="font-bold font-sans pl-3 py-4 my-2 rounded-full border-green-500 
+                hover:bg-green-900 hover:border-l-6 hover:text-green-500 transition-all ease-in-out
+                {% if active_page == 'Blacklisted Users' %} bg-green-900 border-l-6 text-green-500 {% endif %}">
+                Blacklisted Users</a>
+            <a href="{{ url_for('admin.manage_users') }}" class="font-bold font-sans pl-3 py-4 my-2 rounded-full border-green-500 
+                hover:bg-green-900 hover:border-l-6 hover:text-green-500 transition-all ease-in-out
+                {% if active_page == 'Manage Users' %} bg-green-900 border-l-6 text-green-500 {% endif %}">
+                Manage Users</a>
+            <a href="#" class="font-bold font-sans pl-3 py-4 my-2 rounded-full border-green-500 
+                hover:bg-green-900 hover:border-l-6 hover:text-green-500 transition-all ease-in-out">
+                Edit Users</a>
+            <a href="#" class="font-bold font-sans pl-3 py-4 my-2 rounded-full border-green-500 
+                hover:bg-green-900 hover:border-l-6 hover:text-green-500 transition-all ease-in-out">
+                Reset Credentials</a>
+        </div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+            <div class="flex items-center gap-3 px-2 py-3 rounded-xl">
+                <div class="size-8 rounded-full bg-sage-700 overflow-hidden"
+                    data-alt="Administrator user profile avatar small"
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGix7doZqu8Zf_TY8mEx-MkNnI3r7P7vOzFI0HajoeSj9QBP5s52kZuhwErBe55opUtvswo1qEUVxLVweTXi8KbDCf-SgRZzcxF2oT-5AsrBFVKku6yQxdm3sn6BVKetKojsPVbZKj5I6bv_0xOWAn8WbQhmQfXb2O7Dj3zCSaabl0UX_Xg70Mr6IVQL5r8cEGdfIMCcuIld8yrOUinUVrHJ8cyjYx4vNp-E34ES-AbwicW884BrFEyxAb8EvAtiJ0tzlagpNTDs0')">
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-md font-bold truncate">{{ current_user.username }}</p>
+                    <p class="text-xs text-sage-200 truncate">{{ current_user.email }}</p>
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="p-1 rounded-lg hover:bg-white/10">
+                    <span class="material-symbols-outlined text-sm">logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="px-6 py-4 bg-white shadow-sm flex justify-between items-center mb-6 ml-70">
+    <div class="font-bold text-xl text-gray-900">{{ active_page }}</div>
+
+    <div class="flex items-center space-x-2">
+        <div class="flex items-center gap-4">
+
+            <details class="relative list-none">
+                <summary
+                    class="relative p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer list-none appearance-none [&::-webkit-details-marker]:hidden">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 size-2 bg-blue-600 rounded-full border-2 border-white"></span>
+                </summary>
+
+                <div
+                    class="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                        <h4 class="font-bold text-sm text-gray-900">Notifications</h4>
+                        <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">3
+                            NEW</span>
+                    </div>
+
+                    <div class="max-h-64 overflow-y-auto">
+                        <div class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer">
+                            <p class="text-xs font-bold text-gray-900">New User Request</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Alex Rivera is waiting for approval.</p>
+                            <p class="text-[9px] text-blue-500 mt-2">2 minutes ago</p>
+                        </div>
+                        <div class="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer">
+                            <p class="text-xs font-bold text-gray-900">Security Alert</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Multiple failed logins from 192.168.1.104</p>
+                            <p class="text-[9px] text-rose-500 mt-2">15 minutes ago</p>
+                        </div>
+                    </div>
+
+                    <a href="#"
+                        class="block p-3 text-center text-xs font-bold text-blue-600 hover:bg-gray-50 transition-colors">
+                        View All Notifications
+                    </a>
+                </div>
+            </details>
+
+            <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+                <span class="material-symbols-outlined">help</span>
+            </button>
+
+            <div class="h-8 w-[1px] bg-gray-200"></div>
+
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-gray-900">{{ current_user.username }}</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">{{ current_user.role }}
+                    </p>
+                </div>
+                <div
+                    class="size-10 rounded-full border-2 border-blue-600/20 p-0.5 transition-transform group-hover:scale-105">
+                    <div class="w-full h-full rounded-full bg-cover bg-center bg-gray-200"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCMTCSgt4eflV9dJtT-rKLZM32V5jb4eYChbmojTjS9lp_sXwF819SmvmCnoHOCBQIc96i67NZStVhmg9f_8uGn2M0_BR_6ncVXrcF7f3V3S2c86lk0QH6E6norO8icqszuBlVxrVWIHhO-EH0KVrDocI3-WHtjBEmjLBbvAF97TrnNWIqbvn0N_f5HisIykp4J0kFxP7kzooHyxJWbFnNtD7mziNqfFQBpUlhcHR2Vel9lVwg50SsX9dewDcaa6pj-MS1ta8AqNYA')">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% block admin_content %}{% endblock %}
 {% endblock %}

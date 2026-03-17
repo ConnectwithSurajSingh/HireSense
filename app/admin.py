@@ -23,7 +23,8 @@ def admin_required(f):
 @admin_required
 def dashboard():
     pending_users = User.query.filter_by(is_approved=False, is_blacklisted=False).all()
-    return render_template("admin/dashboard.html", pending_users=pending_users)
+    total_users = User.query.filter_by(is_approved=True, is_blacklisted=False).count()
+    return render_template("admin/dashboard.html", pending_users=pending_users, total_users=total_users, active_page="Dashboard")
 
 
 @admin_bp.route("/approve/<int:user_id>", methods=["POST"])
@@ -54,7 +55,7 @@ def reject_user(user_id):
 @admin_required
 def manage_users():
     users = User.query.filter(User.id != current_user.id).order_by(User.created_at.desc()).all()
-    return render_template("admin/manage_users.html", users=users)
+    return render_template("admin/manage_users.html", users=users, active_page="Manage Users")
 
 
 @admin_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
@@ -174,7 +175,7 @@ def force_logout(user_id):
 @admin_required
 def blacklisted_users():
     users = User.query.filter_by(is_blacklisted=True).order_by(User.updated_at.desc()).all()
-    return render_template("admin/blacklisted_users.html", users=users)
+    return render_template("admin/blacklisted_users.html", users=users, active_page="Blacklisted Users")
 
 
 @admin_bp.route("/whitelist/<int:user_id>", methods=["POST"])
