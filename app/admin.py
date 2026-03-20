@@ -107,11 +107,6 @@ def edit_user(user_id):
             notify_admin("Invalid role.", "danger")
             return render_template("admin/edit_user.html", user=user)
 
-        existing = User.query.filter(User.username == new_username, User.id != user.id).first()
-        if existing:
-            notify_admin("Username already taken.", "danger")
-            return render_template("admin/edit_user.html", user=user)
-
         existing = User.query.filter(User.email == new_email, User.id != user.id).first()
         if existing:
             notify_admin("Email already in use.", "danger")

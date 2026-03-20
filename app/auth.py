@@ -62,10 +62,6 @@ def register():
             flash("Invalid role.", "danger")
             return render_template("auth/register.html")
 
-        if User.query.filter_by(username=username).first():
-            flash("Username already taken.", "danger")
-            return render_template("auth/register.html")
-
         if User.query.filter_by(email=email).first():
             flash("Email already registered.", "danger")
             return render_template("auth/register.html")

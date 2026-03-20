@@ -17,7 +17,7 @@ app = create_app(port)
 def seed_admin():
     with app.app_context():
         db.create_all()
-        admin = User.query.filter_by(username="admin").first()
+        admin = User.query.filter_by(email="admin@hiresense.local").first()
         if not admin:
             admin = User(
                 username="admin",
