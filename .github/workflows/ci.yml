@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ['3.13']
 
     services:
       postgres:
@@ -74,7 +74,7 @@ jobs:
           coverage report --fail-under=85
 
       - name: Upload coverage reports to Codecov (optional)
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.13'
         uses: codecov/codecov-action@v4
         with:
           file: ./testing/coverage.xml
@@ -102,7 +102,7 @@ jobs:
           retention-days: 30
 
       - name: Comment PR with coverage
-        if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+        if: github.event_name == 'pull_request' && matrix.python-version == '3.13'
         uses: py-cov-action/python-coverage-comment-action@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

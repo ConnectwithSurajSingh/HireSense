@@ -13,7 +13,7 @@ contributors and deployments can reproduce and apply the exact same schema evolu
 - `migrations/` — Alembic environment and generated migration scripts.
 - `migrations/env.py` — Alembic environment; configures how migrations connect to the app's DB.
 - `migrations/versions/` — each file here is a migration script (one script per change).
-- `migrate.py` — a helper script in the repo that automates `flask db init`, `flask db migrate`,
+- `scripts/migrate.py` — a helper script in the repo that automates `flask db init`, `flask db migrate`,
   and `flask db upgrade` using Flask-Migrate's Python API.
 
 ## Typical workflow
@@ -21,7 +21,7 @@ contributors and deployments can reproduce and apply the exact same schema evolu
 2. Run the helper to autogenerate a migration and apply it:
 
 ```bash
-python migrate.py -m "describe change briefly"
+python scripts/migrate.py -m "describe change briefly"
 ```
 
 3. Review `migrations/versions/<rev>_*.py` and, if needed, adjust the generated operations
@@ -40,7 +40,7 @@ must be given a value for existing rows. The safe pattern used in this project i
 
 This preserves existing data and avoids `NOT NULL` violations when applying migrations.
 
-## About the `migrate.py` helper
+## About the `scripts/migrate.py` helper
 - It loads `.env` (if present) so local development `DATABASE_URL` is picked up.
 - If `migrations/` does not exist it runs `flask db init` for you.
 - By default it runs an autogenerate (`flask db migrate`) and then `flask db upgrade`.

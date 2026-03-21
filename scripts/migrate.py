@@ -4,9 +4,13 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Add project root to sys.path so we can import 'app'
+ROOT_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(ROOT_DIR))
+
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(__file__).parent / ".env")
+    load_dotenv(ROOT_DIR / ".env")
 except ImportError:
     pass
 
@@ -17,7 +21,7 @@ from flask_migrate import upgrade as migrate_upgrade
 from app import create_app, db
 import app.models
 
-MIGRATIONS_DIR = Path(__file__).parent / "migrations"
+MIGRATIONS_DIR = ROOT_DIR / "migrations"
 
 
 def run(message: str, upgrade_only: bool, init_only: bool) -> None:
