@@ -231,10 +231,78 @@ Add a body paragraph for non-trivial changes.
 
 ---
 
+## Testing
+
+**All contributions must include appropriate tests and maintain 85%+ code coverage.**
+
+### Running Tests Locally
+
+Before submitting a PR, run the test suite locally:
+
+```bash
+# Run all tests
+pytest
+
+# Run tests with coverage report
+pytest --cov=app --cov-report=term-missing
+
+# Run specific test categories
+pytest testing/unit/          # Unit tests only
+pytest testing/integration/   # Integration tests only
+pytest testing/system/        # System/E2E tests only
+```
+
+### Writing Tests
+
+When adding new features or fixing bugs:
+
+1. **Write tests first** (TDD approach recommended)
+2. Place tests in the appropriate directory:
+   - `testing/unit/` - Unit tests for isolated components
+   - `testing/integration/` - Integration tests for module interactions
+   - `testing/system/` - End-to-end workflow tests
+
+3. **Ensure tests are**:
+   - Independent and isolated
+   - Repeatable and deterministic
+   - Well-documented with clear docstrings
+   - Following the Arrange-Act-Assert pattern
+
+4. **Use existing fixtures** from `testing/conftest.py`:
+   ```python
+   def test_example(client, db_session, admin_user):
+       # Your test code here
+   ```
+
+### Coverage Requirements
+
+- **Minimum coverage**: 85%
+- **CI/CD enforcement**: PRs with <85% coverage will be blocked
+- **Check coverage locally**:
+  ```bash
+  pytest --cov=app --cov-report=html
+  open testing/coverage_html/index.html
+  ```
+
+### Test Documentation
+
+For comprehensive testing information, refer to **[TESTING.md](TESTING.md)**, which covers:
+
+- Complete test suite architecture
+- How to run, add, modify, and delete tests
+- Coverage report interpretation
+- Troubleshooting common issues
+- Testing best practices
+
+**Any questions about testing?** See [TESTING.md](TESTING.md) as the source of truth for all QA procedures.
+
+---
+
 ## PR Checklist
 
 - Change is focused and does one thing
 - Tested locally (all three ports if relevant)
+- **Tests written and passing (coverage ≥85%)**
 - No secrets or credentials included
 - Relevant documentation updated
 - Commit messages follow guidelines
