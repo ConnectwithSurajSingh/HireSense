@@ -110,7 +110,7 @@ class TestManagerEmployeeMatching:
             f"/manager/projects/{project_with_skills.id}/match"
         )
         assert response.status_code == 200
-        assert b"Matching Employees" in response.data
+        assert b"Find Matches" in response.data
 
     def test_assign_employee(self, authenticated_manager_client, project, employee_user):
         """Test assigning employee to project."""
@@ -195,7 +195,7 @@ class TestManagerSelfService:
             "/manager/compare?target_role=senior_developer"
         )
         assert response.status_code == 200
-        assert b"Comparison Results" in response.data
+        assert b"Role Comparison" in response.data
 
 
 class TestManagerProjectEditing:
