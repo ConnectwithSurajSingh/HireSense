@@ -110,7 +110,7 @@ class TestManagerEmployeeMatching:
             f"/manager/projects/{project_with_skills.id}/match"
         )
         assert response.status_code == 200
-        assert b"Matching Employees" in response.data
+        assert b"Find Matches" in response.data
 
     def test_assign_employee(self, authenticated_manager_client, project, employee_user):
         """Test assigning employee to project."""
@@ -195,7 +195,7 @@ class TestManagerSelfService:
             "/manager/compare?target_role=senior_developer"
         )
         assert response.status_code == 200
-        assert b"Comparison Results" in response.data
+        assert b"Role Comparison" in response.data
 
 
 class TestManagerProjectEditing:
@@ -314,3 +314,106 @@ class TestManagerEmployeeSkillVerification:
         assert response.status_code == 200
         assert b"verified" in response.data.lower() or b"Skill" in response.data
 
+
+from unittest.mock import patch
+
+class TestManagerEdgeCases:
+    def test_create_project_manager_value_error(self, authenticated_manager_client):
+        with patch("app.services.project_service.ProjectService.create_project") as mock_create:
+            mock_create.side_effect = ValueError("Invalid end date")
+            response = authenticated_manager_client.post(
+                "/manager/projects/create",
+                data={"title": "Valid Title", "description": "Desc"},
+                follow_redirects=True
+            )
+            assert b"Invalid end date" in response.data
+
+    def test_edit_project_manager_value_error(self, authenticated_manager_client, project):
+        with patch("app.services.project_service.ProjectService.update_project") as mock_update:
+            mock_update.side_effect = ValueError("Cannot update status")
+            response = authenticated_manager_client.post(
+                f"/manager/projects/{project.id}/edit",
+                data={"title": "Updated", "description": "Desc"},
+                follow_redirects=True
+            )
+            assert b"Cannot update status" in response.data
+
+    def test_add_project_skill_missing_id(self, authenticated_manager_client, project):
+        response = authenticated_manager_client.post(
+            f"/manager/projects/{project.id}/skills/add",
+            data={"minimum_proficiency": 2},
+            follow_redirects=True
+        )
+        assert b"Please select a skill" in response.data
+
+    def test_add_project_skill_value_error(self, authenticated_manager_client, project, skills):
+        with patch("app.services.project_service.ProjectService.add_project_skill") as mock_add:
+            mock_add.side_effect = ValueError("Skill already exists")
+            response = authenticated_manager_client.post(
+                f"/manager/projects/{project.id}/skills/add",
+                data={"skill_id": skills[0].id, "minimum_proficiency": 2},
+                follow_redirects=True
+            )
+            assert b"Skill already exists" in response.data
+
+    def test_assign_employee_missing_user(self, authenticated_manager_client, project):
+        response = authenticated_manager_client.post(
+            f"/manager/projects/{project.id}/assign",
+            data={"role_in_project": "Dev"}, # user_id missing
+            follow_redirects=True
+        )
+        assert b"Please select an employee" in response.data
+
+    def test_assign_employee_value_error(self, authenticated_manager_client, project, employee_user):
+        with patch("app.services.project_service.ProjectService.assign_employee_to_project") as mock_assign:
+            mock_assign.side_effect = ValueError("Employee already assigned")
+            response = authenticated_manager_client.post(
+                f"/manager/projects/{project.id}/assign",
+                data={"user_id": employee_user.id, "role_in_project": "Dev"},
+                follow_redirects=True
+            )
+            assert b"Employee already assigned" in response.data
+
+    def test_verify_employee_skill_missing_id(self, authenticated_manager_client, employee_with_skills):
+        response = authenticated_manager_client.post(
+            f"/manager/employees/{employee_with_skills.id}/skills/verify",
+            data={},
+            follow_redirects=True
+        )
+        assert b"Invalid skill" in response.data
+
+    def test_verify_employee_skill_value_error(self, authenticated_manager_client, employee_with_skills, skills):
+        with patch("app.services.skill_service.SkillService.verify_user_skill") as mock_verify:
+            mock_verify.side_effect = ValueError("Skill cannot be verified")
+            response = authenticated_manager_client.post(
+                f"/manager/employees/{employee_with_skills.id}/skills/verify",
+                data={"skill_id": skills[0].id},
+                follow_redirects=True
+            )
+            assert b"Skill cannot be verified" in response.data
+
+    def test_update_my_skill_missing_data(self, authenticated_manager_client):
+        response = authenticated_manager_client.post(
+            "/manager/skills/update",
+            data={"skill_id": ""},
+            follow_redirects=True
+        )
+        assert b"Invalid request" in response.data
+
+    def test_update_my_skill_value_error(self, authenticated_manager_client, skills):
+        with patch("app.services.skill_service.SkillService.update_user_skill") as mock_update:
+            mock_update.side_effect = ValueError("Update failed")
+            response = authenticated_manager_client.post(
+                "/manager/skills/update",
+                data={"skill_id": skills[0].id, "proficiency_level": 5},
+                follow_redirects=True
+            )
+            assert b"Update failed" in response.data
+
+    def test_generate_learning_path_missing_role(self, authenticated_manager_client):
+        response = authenticated_manager_client.post(
+            "/manager/learning-paths/generate",
+            data={"target_role": "   "},
+            follow_redirects=True
+        )
+        assert b"Please select a target role" in response.data

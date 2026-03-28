@@ -2,60 +2,175 @@
 {% block title %} – Match Employees for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<h1>Find Matching Employees: {{ project.title }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p>
-    <a href="{{ url_for('manager.view_project', project_id=project.id) }}">&larr; Back to Project</a> |
-    <a href="{{ url_for('manager.project_team', project_id=project.id) }}">View Current Team</a>
-</p>
+        <nav class="flex items-center gap-4">
+            <a href="{{ url_for('manager.view_project', project_id=project.id) }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Project
+            </a>
+            <span class="text-text-light">|</span>
+            <a href="{{ url_for('manager.project_team', project_id=project.id) }}"
+                class="text-text-muted hover:text-primary-700 font-bold transition-colors">
+                View Current Team
+            </a>
+        </nav>
 
-<h2>Required Skills</h2>
-{% if skill_requirements %}
-<ul>
-    {% for skill in skill_requirements %}
-    <li>{{ skill.skill_name }} ({{ 'Mandatory' if skill.is_mandatory else 'Optional' }}, Level {{
-        skill.minimum_proficiency }}+)</li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No skill requirements defined. <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Add skills
-        first</a></p>
-{% endif %}
+        <header class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <div class="flex items-center gap-3">
+                    <span
+                        class="px-3 py-1 bg-primary-700 text-text-inverse text-[10px] font-black uppercase rounded-full tracking-widest">Resource
+                        Allocation</span>
+                </div>
+                <h1 class="text-4xl font-black text-text-main tracking-tight">Find Matches: {{ project.title }}</h1>
+            </div>
+            <span
+                class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-text-light/10">person_search</span>
+        </header>
 
-<h2>Matching Employees ({{ matches|length }})</h2>
-{% if matches %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Department</th>
-        <th>Match Score</th>
-        <th>Mandatory Met</th>
-        <th>Optional Matched</th>
-        <th>Actions</th>
-    </tr>
-    {% for match in matches %}
-    <tr style="{% if match.mandatory_met %}background-color: #d4edda;{% else %}background-color: #f8d7da;{% endif %}">
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=match.user_id) }}">{{ match.username }}</a></td>
-        <td>{{ match.email }}</td>
-        <td>{{ match.department or '-' }}</td>
-        <td>{{ match.match_score }}</td>
-        <td>{{ match.mandatory_count }}</td>
-        <td>{{ match.optional_matched }}/{{ match.optional_count }}</td>
-        <td>
-            <form method="POST" action="{{ url_for('manager.assign_employee', project_id=project.id) }}"
-                style="display: inline;">
-                <input type="hidden" name="user_id" value="{{ match.user_id }}">
-                <input type="text" name="role_in_project" placeholder="Role (optional)" style="width: 100px;">
-                <button type="submit">Assign</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-<p><small>Green rows indicate all mandatory skills are met. Red rows indicate missing mandatory skills.</small></p>
-{% else %}
-<p>No employees available to assign.</p>
-{% endif %}
+            <aside class="lg:col-span-1 space-y-6">
+                <section class="bg-surface rounded-2xl border border-border-main p-6 shadow-sm">
+                    <h3
+                        class="text-sm font-black text-text-main uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600 text-sm">checklist</span>
+                        Required Skills
+                    </h3>
+
+                    {% if skill_requirements %}
+                    <div class="space-y-3">
+                        {% for skill in skill_requirements %}
+                        <div class="p-3 bg-background rounded-xl border border-border-main">
+                            <p class="text-sm font-bold text-text-main">{{ skill.skill_name }}</p>
+                            <div class="flex items-center justify-between mt-1">
+                                <span
+                                    class="text-[10px] font-black uppercase {% if skill.is_mandatory %}text-danger-800{% else %}text-text-muted{% endif %}">
+                                    {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
+                                </span>
+                                <span class="text-[10px] font-bold text-primary-700">Lvl {{ skill.minimum_proficiency
+                                    }}+</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-xs text-text-muted italic">No requirements defined. <a
+                            href="{{ url_for('manager.project_skills', project_id=project.id) }}"
+                            class="text-primary-700 font-bold underline">Add skills</a></p>
+                    {% endif %}
+                </section>
+            </aside>
+
+            <main class="lg:col-span-3 space-y-6">
+                <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+                    <div class="bg-surface px-8 py-5 border-b border-border-main flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-text-main">Top Talent Matches ({{ matches|length }})</h2>
+                    </div>
+
+                    <div class="overflow-x-auto overflow-y-auto max-h-150">
+                        <table class="w-full text-left border-separate border-spacing-0">
+                            <thead>
+                                <tr>
+                                    {% set th_classes = "sticky top-0 bg-background border-b border-border-main px-8 py-4 text-xs
+                                    font-bold uppercase tracking-wider text-text-muted" %}
+                                    <th class="{{ th_classes }}">Candidate</th>
+                                    <th class="{{ th_classes }}">Department</th>
+                                    <th class="{{ th_classes }} text-center">Compatibility</th>
+                                    <th class="{{ th_classes }} text-center">Requirements</th>
+                                    <th class="{{ th_classes }} text-right">Quick Assign</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border-main">
+                                {% if matches %}
+                                {% for match in matches %}
+                                <tr class="group hover:bg-background transition-colors">
+                                    <td class="px-8 py-6">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-black text-xs">
+                                                {{ match.username[:2] | upper }}
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <a href="{{ url_for('manager.view_employee_skills', user_id=match.user_id) }}"
+                                                    class="font-bold text-text-main hover:text-primary-700 transition-colors">{{
+                                                    match.username }}</a>
+                                                <span class="text-xs text-text-muted">{{ match.email }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6 text-sm text-text-main font-medium">
+                                        {{ match.department or 'General' }}
+                                    </td>
+                                    <td class="px-8 py-6 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-lg font-black text-primary-700">{{ match.match_score
+                                                }}</span>
+                                            <span class="text-[10px] text-text-light font-bold uppercase">Points</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <div class="flex flex-col gap-2 items-center">
+                                            {% if match.mandatory_met %}
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-black uppercase">
+                                                <span class="material-symbols-outlined text-xs">check_circle</span> All
+                                                Mandatory Met
+                                            </span>
+                                            {% else %}
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-danger-50 text-danger-800 text-[10px] font-black uppercase">
+                                                <span class="material-symbols-outlined text-xs">cancel</span> Missing
+                                                Critical
+                                            </span>
+                                            {% endif %}
+                                            <span class="text-[10px] font-bold text-text-muted">
+                                                Optional: {{ match.optional_matched }}/{{ match.optional_count }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        <form method="POST"
+                                            action="{{ url_for('manager.assign_employee', project_id=project.id) }}"
+                                            class="flex items-center justify-end gap-2">
+                                            <input type="hidden" name="user_id" value="{{ match.user_id }}">
+                                            <input type="text" name="role_in_project" placeholder="Role..."
+                                                class="w-24 bg-background border border-border-main rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-primary-600 outline-none">
+                                            <button type="submit"
+                                                class="bg-primary-700 text-text-inverse px-4 py-1.5 rounded-lg text-xs font-black hover:bg-primary-800 transition-all active:scale-95">
+                                                Assign
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="px-8 py-16 text-center text-text-muted">
+                                        <span class="material-symbols-outlined text-4xl mb-2">person_off</span>
+                                        <p>No eligible employees found for these criteria.</p>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <div class="flex items-center gap-2 bg-primary-50 p-4 rounded-xl border border-primary-100">
+                    <span class="material-symbols-outlined text-primary-700">info</span>
+                    <p class="text-xs text-primary-800 font-medium">
+                        Candidates are ranked by their match score, calculated based on proficiency levels and skill
+                        relevance.
+                        <strong>Verified skills</strong> carry more weight in the calculation.
+                    </p>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
 {% endblock %}

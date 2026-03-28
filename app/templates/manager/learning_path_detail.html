@@ -2,65 +2,155 @@
 {% block title %} – Learning Path Details{% endblock %}
 
 {% block manager_content %}
-<h1>Learning Path: {{ content.target_role_title or path.target_role }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p><a href="{{ url_for('manager.learning_paths') }}">&larr; Back to Learning Paths</a></p>
+        <nav>
+            <a href="{{ url_for('manager.learning_paths') }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Learning Paths
+            </a>
+        </nav>
 
-<table border="1" cellpadding="8">
-    <tr>
-        <td><strong>Target Role</strong></td>
-        <td>{{ content.target_role_title or path.target_role }}</td>
-    </tr>
-    <tr>
-        <td><strong>Status</strong></td>
-        <td>{{ path.status }}</td>
-    </tr>
-    <tr>
-        <td><strong>Readiness Score</strong></td>
-        <td>{{ content.readiness_score }}%</td>
-    </tr>
-    <tr>
-        <td><strong>Skills to Learn</strong></td>
-        <td>{{ content.total_skills_to_learn }}</td>
-    </tr>
-    <tr>
-        <td><strong>Skills to Improve</strong></td>
-        <td>{{ content.skills_to_improve }}</td>
-    </tr>
-    <tr>
-        <td><strong>Generated</strong></td>
-        <td>{{ path.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-    </tr>
-</table>
+        <header
+            class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-surface p-8 rounded-2xl border border-border-main shadow-sm">
+            <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-black uppercase rounded-full">AI
+                        Analysis Complete</span>
+                    <span class="text-text-light text-xs font-bold uppercase tracking-widest">ID: #LP-{{ path.id
+                        }}</span>
+                </div>
+                <h1 class="text-4xl font-black text-text-main tracking-tight">
+                    {{ content.target_role_title or path.target_role }}
+                </h1>
+                <p class="text-text-muted font-medium">Path generated on {{ path.created_at.strftime('%b %d, %Y at
+                    %H:%M') }}</p>
+            </div>
 
-<h2>Recommendations</h2>
-{% if content.recommendations %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Skill</th>
-        <th>Priority</th>
-        <th>Current Level</th>
-        <th>Target Level</th>
-        <th>Required</th>
-        <th>Resources</th>
-    </tr>
-    {% for rec in content.recommendations %}
-    <tr
-        style="{% if rec.priority == 'high' %}background-color: #f8d7da;{% elif rec.priority == 'medium' %}background-color: #fff3cd;{% else %}background-color: #d4edda;{% endif %}">
-        <td>{{ rec.skill_name }}</td>
-        <td>{{ rec.priority|upper }}</td>
-        <td>{{ rec.current_level }}/5</td>
-        <td>{{ rec.target_level }}/5</td>
-        <td>{{ 'Yes' if rec.is_required else 'No' }}</td>
-        <td>
-            {% for resource in rec.resources %}
-            <small>{{ resource.type }}: {{ resource.title }}</small><br>
-            {% endfor %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No recommendations at this time.</p>
-{% endif %}
+            <div class="flex flex-col items-center md:items-end gap-2">
+                <span class="text-sm font-black text-text-main uppercase tracking-widest">Readiness Score</span>
+                <div class="w-64 h-4 bg-background rounded-full overflow-hidden border border-border-main p-0.5">
+                    <div class="h-full bg-primary-600 rounded-full" style="width: {{ content.readiness_score }}%"></div>
+                </div>
+                <span class="text-3xl font-black text-primary-700">{{ content.readiness_score }}%</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-surface p-6 rounded-2xl border border-border-main flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">star</span>
+                </div>
+                <div>
+                    <p class="text-text-light text-xs font-black uppercase">Status</p>
+                    <p class="text-text-main font-bold capitalize">{{ path.status }}</p>
+                </div>
+            </div>
+            <div class="bg-surface p-6 rounded-2xl border border-border-main flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">school</span>
+                </div>
+                <div>
+                    <p class="text-text-light text-xs font-black uppercase">Skills to Learn</p>
+                    <p class="text-text-main font-bold">{{ content.total_skills_to_learn }} New</p>
+                </div>
+            </div>
+            <div class="bg-surface p-6 rounded-2xl border border-border-main flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-700 flex items-center justify-center">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div>
+                    <p class="text-text-light text-xs font-black uppercase">Skills to Improve</p>
+                    <p class="text-text-main font-bold">{{ content.skills_to_improve }} Areas</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+            <div class="bg-surface px-8 py-5 border-b border-border-main">
+                <h2 class="text-xl font-bold text-text-main flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary-600">list_alt</span>
+                    Gap Analysis & Recommendations
+                </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead>
+                        <tr>
+                            {% set th_classes = "bg-background border-b border-border-main px-8 py-4 text-xs font-bold
+                            uppercase tracking-wider text-text-muted" %}
+                            <th class="{{ th_classes }}">Skill Name</th>
+                            <th class="{{ th_classes }}">Priority</th>
+                            <th class="{{ th_classes }}">Gap Level</th>
+                            <th class="{{ th_classes }}">Requirement</th>
+                            <th class="{{ th_classes }}">Recommended Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main">
+                        {% if content.recommendations %}
+                        {% for rec in content.recommendations %}
+                        <tr class="group hover:bg-primary-50/30 transition-colors">
+                            <td class="px-8 py-6">
+                                <span class="font-bold text-text-main text-lg">{{ rec.skill_name }}</span>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest
+                                        {% if rec.priority == 'high' %} bg-danger-50 text-danger-800
+                                        {% elif rec.priority == 'medium' %} bg-info-50 text-info-800
+                                        {% else %} bg-success-50 text-success-800 {% endif %}">
+                                    {{ rec.priority }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-text-muted text-sm">{{ rec.current_level }}</span>
+                                    <span class="material-symbols-outlined text-text-light text-xs">arrow_forward</span>
+                                    <span class="text-primary-700 font-black text-sm">{{ rec.target_level }}</span>
+                                    <span class="text-text-light text-[10px]">/ 5</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                {% if rec.is_required %}
+                                <span class="text-xs font-bold text-text-main flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-primary-600 text-sm">lock</span>
+                                    Mandatory
+                                </span>
+                                {% else %}
+                                <span class="text-xs font-medium text-text-muted italic">Optional</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex flex-wrap gap-2">
+                                    {% for resource in rec.resources %}
+                                    <div
+                                        class="flex items-center gap-1.5 px-3 py-1 bg-background border border-border-main rounded-md group/res hover:border-primary-600 transition-colors cursor-default">
+                                        <span class="material-symbols-outlined text-xs text-primary-600">
+                                            {% if resource.type|lower == 'course' %}video_library
+                                            {% elif resource.type|lower == 'book' %}menu_book
+                                            {% else %}link{% endif %}
+                                        </span>
+                                        <span class="text-[11px] font-bold text-text-main">{{ resource.title }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-16 text-center text-text-muted">
+                                <p>No recommendations available for this path.</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}

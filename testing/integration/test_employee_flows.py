@@ -323,3 +323,118 @@ class TestEmployeeAssignmentDetails:
         response = authenticated_employee_client.get(f"/employee/assignments/{assignment.id}")
         # Should either be allowed (if it's their own) or forbidden
         assert response.status_code in [200, 403, 404]
+
+from unittest.mock import patch
+
+class TestEmployeeResumeEdgeCases:
+    """Extra tests addressing missing edge cases in employee resume flows."""
+    
+    def test_upload_resume_get(self, authenticated_employee_client):
+        """Test GET request to upload resume page."""
+        response = authenticated_employee_client.get("/employee/resume/upload")
+        assert response.status_code == 200
+        assert b"Upload" in response.data
+
+    def test_upload_resume_no_file_part(self, authenticated_employee_client):
+        """Test uploading a resume with no file part in request."""
+        response = authenticated_employee_client.post(
+            "/employee/resume/upload",
+            data={},
+            content_type="multipart/form-data",
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"No file selected" in response.data
+
+    def test_upload_resume_no_filename(self, authenticated_employee_client):
+        """Test uploading a resume with a blank filename."""
+        import io
+        data = {
+            "resume_file": (io.BytesIO(b""), ""),
+        }
+        response = authenticated_employee_client.post(
+            "/employee/resume/upload",
+            data=data,
+            content_type="multipart/form-data",
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"No file selected" in response.data
+
+    @patch("app.services.resume_service.ResumeService.parse_resume_skills")
+    def test_upload_resume_nlp_exception(self, mock_parse, authenticated_employee_client, tmp_path):
+        """Test uploading a resume where NLP parsing throws an exception."""
+        mock_parse.side_effect = Exception("NLP timeout error")
+        test_file = tmp_path / "test.pdf"
+        test_file.write_bytes(b"%PDF-1.4\nTest content")
+
+        with open(test_file, 'rb') as f:
+            data = {"resume_file": (f, "test.pdf")}
+            response = authenticated_employee_client.post(
+                "/employee/resume/upload",
+                data=data,
+                content_type="multipart/form-data",
+                follow_redirects=True,
+            )
+        assert response.status_code == 200
+        assert b"automatic skill extraction failed" in response.data
+
+    @patch("app.services.resume_service.ResumeService.upload_resume")
+    def test_upload_resume_value_error(self, mock_upload, authenticated_employee_client, tmp_path):
+        """Test uploading a resume where upload_resume raises ValueError."""
+        mock_upload.side_effect = ValueError("Invalid file structure")
+        test_file = tmp_path / "test.pdf"
+        test_file.write_bytes(b"%PDF-1.4\nTest content")
+
+        with open(test_file, 'rb') as f:
+            data = {"resume_file": (f, "test.pdf")}
+            response = authenticated_employee_client.post(
+                "/employee/resume/upload",
+                data=data,
+                content_type="multipart/form-data",
+                follow_redirects=True,
+            )
+        assert response.status_code == 200
+        assert b"Invalid file structure" in response.data
+
+
+class TestEmployeeSkillAndLearningEdgeCases:
+    """Extra tests for missing branches in skill management and learning paths."""
+
+    def test_add_skill_missing_id(self, authenticated_employee_client):
+        response = authenticated_employee_client.post(
+            "/employee/skills/add",
+            data={"proficiency_level": 3},
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"Please select a skill" in response.data
+        
+    def test_update_skill_missing_data(self, authenticated_employee_client):
+        response = authenticated_employee_client.post(
+            "/employee/skills/update",
+            data={"skill_id": ""},
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"Invalid request" in response.data
+
+    @patch("app.services.skill_service.SkillService.update_user_skill")        
+    def test_update_skill_value_error(self, mock_update, authenticated_employee_client):
+        mock_update.side_effect = ValueError("Skill cannot be verified")
+        response = authenticated_employee_client.post(
+            "/employee/skills/update",
+            data={"skill_id": 1, "proficiency_level": 5},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"Skill cannot be verified" in response.data
+
+    def test_generate_learning_path_missing_role(self, authenticated_employee_client):
+        response = authenticated_employee_client.post(
+            "/employee/learning-paths/generate",
+            data={"target_role": "   "},
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"Please select a target role" in response.data

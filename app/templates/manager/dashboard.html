@@ -2,69 +2,171 @@
 {% block title %} – Manager Dashboard{% endblock %}
 
 {% block manager_content %}
-<h1>Manager Dashboard</h1>
-<p>Welcome, {{ current_user.username }}.</p>
+<div class="flex flex-col gap-6 px-6 pb-6">
+    <section>
+        <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Welcome, {{current_user.username}}
+        </h1>
+        <p class="text-on-surface-variant font-medium mt-1">Here's what's happening across your team today.</p>
+    </section>
 
-<h2>Statistics</h2>
-<table border="1" cellpadding="10">
-    <tr>
-        <td><strong>Total Projects</strong><br>{{ stats.total_projects }}</td>
-        <td><strong>Active</strong><br>{{ stats.active }}</td>
-        <td><strong>Planning</strong><br>{{ stats.planning }}</td>
-        <td><strong>Completed</strong><br>{{ stats.completed }}</td>
-        <td><strong>On Hold</strong><br>{{ stats.on_hold }}</td>
-        <td><strong>Team Members</strong><br>{{ stats.total_team_members }}</td>
-    </tr>
-</table>
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <!-- Total Projects -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">Total Projects</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.total_projects }}</p>
+        </div>
+        <!-- Active -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">Active</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.active }}</p>
+        </div>
+        <!-- Planning -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">Planning</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.planning }}</p>
+        </div>
+        <!-- Completed -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">Completed</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.completed }}</p>
+        </div>
+        <!-- On Hold -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">On Hold</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.on_hold }}</p>
+        </div>
+        <!-- Team Members -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+            <p class="text-xs font-bold text-text-main uppercase tracking-wider">Team Members</p>
+            <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.total_team_members }}</p>
+        </div>
+    </section>
 
-<h2>Recent Projects</h2>
-{% if projects %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Team Size</th>
-        <th>Actions</th>
-    </tr>
-    {% for project in projects %}
-    <tr>
-        <td>{{ project.title }}</td>
-        <td>{{ project.status }}</td>
-        <td>{{ project.assignments.filter_by(status='active').count() }}</td>
-        <td>
-            <a href="{{ url_for('manager.view_project', project_id=project.id) }}">View</a> |
-            <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Skills</a> |
-            <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Match</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No projects yet. <a href="{{ url_for('manager.create_project') }}">Create one</a></p>
-{% endif %}
-
-<h2>Recent Skill Updates</h2>
-{% if recent_updates %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Employee</th>
-        <th>Skill</th>
-        <th>Level</th>
-        <th>Verified</th>
-        <th>Updated</th>
-    </tr>
-    {% for update in recent_updates %}
-    <tr>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}">{{ update.username }}</a>
-        </td>
-        <td>{{ update.skill_name }}</td>
-        <td>{{ update.proficiency_level }}/5</td>
-        <td>{{ 'Yes' if update.is_verified else 'No' }}</td>
-        <td>{{ update.updated_at.strftime('%Y-%m-%d %H:%M') if update.updated_at else '-' }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No recent skill updates.</p>
-{% endif %}
+    <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <!-- Table 1: Recent Projects -->
+        <section
+            class="xl:col-span-3 bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col hover:shadow-xl">
+            <div class="px-6 py-5 bg-surface-container-low flex justify-between items-center">
+                <h3 class="font-headline font-bold text-lg text-text-main">Recent Projects</h3>
+                <button class="text-secondary font-semibold text-sm hover:underline">View All</button>
+            </div>
+            <div class="overflow-x-auto">
+                {% if projects %}
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-background text-xs font-bold border-t border-border-main text-text-muted uppercase tracking-wider">
+                            <th class="px-6 py-4">Title</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                            <th class="px-6 py-4 text-center">Team Size</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main overflow-hidden">
+                        {% for project in projects %}
+                        <tr class="hover:bg-background transition-colors group">
+                            <td class="px-6 py-5">
+                                <!-- Have to map custom icons and move span-text inside the div as per projects if we need to keep it -->
+                                <!-- <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded bg-emerald-100 flex items-center justify-center text-emerald-700">
+                                        <span class="material-symbols-outlined text-sm"
+                                            data-icon="terminal">terminal</span>
+                                    </div>
+                                </div> -->
+                                <span class="font-semibold text-text-main">{{ project.title }}</span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <div class="px-3 py-1 w-fit mx-auto rounded-full bg-primary-200">
+                                    <p class="text-sm font-bold text-primary-700 text-center">
+                                        {{ project.status }}</p>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 text-on-surface-variant font-medium text-center">{{
+                                project.assignments.filter_by(status='active').count() }} Members</td>
+                            <td class="px-6 py-5 text-center">
+                                <div class="flex justify-center gap-1">
+                                    <button
+                                        class="p-2 rounded-lg text-text-main hover:text-blue-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                        title="View">
+                                        <span class="material-symbols-outlined text-xl"
+                                            data-icon="visibility">visibility</span>
+                                    </button>
+                                    <button
+                                        class="p-2 rounded-lg text-text-main hover:text-amber-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                        title="Skills">
+                                        <span class="material-symbols-outlined text-xl"
+                                            data-icon="psychology">psychology</span>
+                                    </button>
+                                    <button
+                                        class="p-2 rounded-lg text-text-main hover:text-green-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                        title="Match">
+                                        <span class="material-symbols-outlined text-xl"
+                                            data-icon="join_inner">join_inner</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-xl text-text-light">No projects yet.
+                    <a href="{{ url_for('manager.create_project') }}"
+                        class="text-blue-400 hover:underline hover:text-blue-600">Create one</a>
+                </p>
+                {% endif %}
+            </div>
+        </section>
+        <!-- Table 2: Recent Skill Updates -->
+        <section
+            class="xl:col-span-2 bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col hover:shadow-xl">
+            <div class="px-6 py-5 bg-surface-container-low">
+                <h3 class="font-headline font-bold text-lg text-on-surface">Recent Skill Updates</h3>
+            </div>
+            <div class="overflow-x-auto">
+                {% if recent_updates %}
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="text-xs font-bold text-on-surface-variant border-b border-background uppercase tracking-wider">
+                            <th class="px-6 py-4 text-left">Employee</th>
+                            <th class="px-6 py-4 text-left">Skill</th>
+                            <th class="px-6 py-4 text-center">Level</th>
+                            <th class="px-6 py-4 text-center">Verified</th>
+                            <th class="px-6 py-4 text-center">Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-background">
+                        {% for update in recent_updates %}
+                        <tr class="bg-surface hover:bg-background transition-colors">
+                            <td class="px-6 py-5">
+                                <a class="text-primary-700 font-bold hover:underline" href="#">{{ update.username }}</a>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-sm font-semibold text-text-muted">{{ update.skill_name }}</span>
+                                </div>
+                            </td>
+                            <td class="text-sm text-center">{{ update.proficiency_level }}/5</td>
+                            <td class="px-6 py-5 text-center">
+                                <span
+                                    class="inline-flex items-center gap-1 text-primary-600 bg-primary-50 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+                                    {{ 'Yes' if update.is_verified else 'No' }}
+                                </span>
+                            </td>
+                            <td class="text-sm text-center px-2">{{ update.updated_at.strftime('%Y-%m-%d %H:%M') if update.updated_at else '-'
+                            }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-xl text-text-light pb-3">No Skill Updates.
+                </p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}

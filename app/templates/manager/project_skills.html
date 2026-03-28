@@ -2,81 +2,165 @@
 {% block title %} – Skills for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<h1>Skill Requirements: {{ project.title }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p>
-    <a href="{{ url_for('manager.view_project', project_id=project.id) }}">&larr; Back to Project</a>
-</p>
+        <nav>
+            <a href="{{ url_for('manager.view_project', project_id=project.id) }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Project: {{ project.title }}
+            </a>
+        </nav>
 
-<h2>Current Requirements ({{ skill_requirements|length }})</h2>
-{% if skill_requirements %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Skill</th>
-        <th>Category</th>
-        <th>Mandatory</th>
-        <th>Min Level</th>
-        <th>Actions</th>
-    </tr>
-    {% for skill in skill_requirements %}
-    <tr>
-        <td>{{ skill.skill_name }}</td>
-        <td>{{ skill.category or '-' }}</td>
-        <td>{{ 'Yes' if skill.is_mandatory else 'No' }}</td>
-        <td>{{ skill.minimum_proficiency }}/5</td>
-        <td>
-            <form method="POST" action="{{ url_for('manager.remove_project_skill', project_id=project.id) }}"
-                style="display: inline;">
-                <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
-                <button type="submit" onclick="return confirm('Remove this skill?');">Remove</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No skill requirements defined yet.</p>
-{% endif %}
+        <header>
+            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Skill Requirements</h1>
+            <p class="text-text-muted">Define the technical DNA required for this project to ensure accurate employee
+                matching.</p>
+        </header>
 
-<h2>Add Skill Requirement</h2>
-{% if available_skills %}
-<form method="POST" action="{{ url_for('manager.add_project_skill', project_id=project.id) }}">
-    <p>
-        <label for="skill_id"><strong>Skill:</strong></label><br>
-        <select id="skill_id" name="skill_id" required style="padding: 8px;">
-            <option value="">-- Select a skill --</option>
-            {% for skill in available_skills %}
-            <option value="{{ skill.id }}">{{ skill.name }} ({{ skill.category or 'uncategorized' }})</option>
-            {% endfor %}
-        </select>
-    </p>
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
 
-    <p>
-        <label for="minimum_proficiency"><strong>Minimum Proficiency Level:</strong></label><br>
-        <select id="minimum_proficiency" name="minimum_proficiency" style="padding: 8px;">
-            <option value="1">1 - Beginner</option>
-            <option value="2">2 - Basic</option>
-            <option value="3" selected>3 - Intermediate</option>
-            <option value="4">4 - Advanced</option>
-            <option value="5">5 - Expert</option>
-        </select>
-    </p>
+            <div class="xl:col-span-2 space-y-6">
+                <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+                    <div class="bg-surface px-8 py-5 border-b border-border-main">
+                        <h2 class="text-xl font-bold text-text-main">Active Requirements ({{ skill_requirements|length
+                            }})</h2>
+                    </div>
 
-    <p>
-        <label>
-            <input type="checkbox" name="is_mandatory" checked>
-            <strong>Mandatory skill</strong>
-        </label>
-    </p>
+                    <div class="overflow-x-auto overflow-y-auto max-h-150 relative">
+                        <table class="w-full text-left border-separate border-spacing-0">
+                            <thead>
+                                <tr>
+                                    {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main
+                                    px-8 py-4 text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                                    <th class="{{ th_classes }}">Skill Name</th>
+                                    <th class="{{ th_classes }}">Category</th>
+                                    <th class="{{ th_classes }}">Priority</th>
+                                    <th class="{{ th_classes }} text-center">Min Level</th>
+                                    <th class="{{ th_classes }} text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border-main">
+                                {% if skill_requirements %}
+                                {% for skill in skill_requirements %}
+                                <tr class="group hover:bg-background transition-colors duration-150">
+                                    <td class="px-8 py-5 font-bold text-text-main">{{ skill.skill_name }}</td>
+                                    <td class="px-8 py-5 text-sm text-text-muted">{{ skill.category or '-' }}</td>
+                                    <td class="px-8 py-5">
+                                        <span
+                                            class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
+                                                {{ 'bg-danger-50 text-danger-800' if skill.is_mandatory else 'bg-primary-50 text-primary-700' }}">
+                                            {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-5 text-center">
+                                        <span class="text-sm font-black text-text-main">{{ skill.minimum_proficiency
+                                            }}/5</span>
+                                    </td>
+                                    <td class="px-8 py-5 text-right">
+                                        <form method="POST"
+                                            action="{{ url_for('manager.remove_project_skill', project_id=project.id) }}">
+                                            <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
+                                            <button type="submit" onclick="return confirm('Remove this requirement?');"
+                                                class="p-2 text-text-light hover:text-danger-800 hover:bg-danger-50 rounded-lg transition-all">
+                                                <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="px-8 py-16 text-center text-text-muted italic">
+                                        No skill requirements defined yet. Add skills on the right to begin.
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
 
-    <p>
-        <button type="submit"
-            style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">
-            Add Skill
-        </button>
-    </p>
-</form>
-{% else %}
-<p>No more skills available to add. All skills are already added to this project.</p>
-{% endif %}
+            <div class="space-y-6">
+                <section class="bg-surface rounded-2xl shadow-sm border border-border-main p-8">
+                    <h3 class="text-xl font-bold text-text-main mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600">assignment_add</span>
+                        Add Requirement
+                    </h3>
+
+                    {% if available_skills %}
+                    <form method="POST" action="{{ url_for('manager.add_project_skill', project_id=project.id) }}"
+                        class="space-y-6">
+                        <div class="space-y-2">
+                            <label for="skill_id"
+                                class="text-sm font-black text-text-main uppercase tracking-wider">Target Skill</label>
+                            <select id="skill_id" name="skill_id" required
+                                class="w-full bg-background border border-border-main rounded-xl px-4 py-3 text-text-main font-medium focus:ring-2 focus:ring-primary-600 outline-none transition-all cursor-pointer">
+                                <option value="">-- Select from Catalog --</option>
+                                {% for skill in available_skills %}
+                                <option value="{{ skill.id }}">{{ skill.name }} ({{ skill.category or 'General' }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="minimum_proficiency"
+                                class="text-sm font-black text-text-main uppercase tracking-wider">Minimum
+                                Proficiency</label>
+                            <select id="minimum_proficiency" name="minimum_proficiency"
+                                class="w-full bg-background border border-border-main rounded-xl px-4 py-3 text-text-main font-medium focus:ring-2 focus:ring-primary-600 outline-none transition-all cursor-pointer">
+                                <option value="1">Level 1 - Beginner</option>
+                                <option value="2">Level 2 - Basic</option>
+                                <option value="3" selected>Level 3 - Intermediate</option>
+                                <option value="4">Level 4 - Advanced</option>
+                                <option value="5">Level 5 - Expert</option>
+                            </select>
+                        </div>
+
+                        <label
+                            class="flex items-center gap-3 p-4 bg-background rounded-xl border border-border-main cursor-pointer group hover:border-primary-300 transition-all">
+                            <input type="checkbox" name="is_mandatory" checked
+                                class="w-5 h-5 rounded border-border-main text-primary-700 focus:ring-primary-600 cursor-pointer">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-text-main">Mandatory Requirement</span>
+                                <span class="text-[10px] text-text-muted uppercase">Essential for matching logic</span>
+                            </div>
+                        </label>
+
+                        <button type="submit"
+                            class="w-full py-4 bg-primary-700 text-text-inverse rounded-xl font-black text-lg hover:bg-primary-800 shadow-lg shadow-primary-900/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">add</span>
+                            Add Requirement
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="bg-primary-50 p-6 rounded-xl border border-primary-200">
+                        <p class="text-primary-800 text-sm font-medium">All available skills from the catalog have been
+                            added as requirements for this project.</p>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <div class="bg-primary-900 p-6 rounded-2xl text-text-inverse relative overflow-hidden group shadow-lg">
+                    <div class="relative z-10">
+                        <h4 class="font-bold mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">lightbulb</span>
+                            Matching Tip
+                        </h4>
+                        <p class="text-xs text-text-inverse/80 leading-relaxed">
+                            Marking a skill as **Mandatory** ensures that the matching algorithm prioritizes employees
+                            who meet or exceed the minimum level.
+                        </p>
+                    </div>
+                    <span
+                        class="material-symbols-outlined absolute -bottom-4 -right-4 text-7xl text-white/10 opacity-30 group-hover:rotate-12 transition-transform duration-500">settings_suggest</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

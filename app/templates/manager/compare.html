@@ -2,81 +2,145 @@
 {% block title %} – Compare Roles{% endblock %}
 
 {% block manager_content %}
-<h1>Compare with Target Role</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<form method="GET" action="{{ url_for('manager.compare_roles') }}">
-    <p>
-        <label for="target_role"><strong>Select Target Role:</strong></label><br>
-        <select id="target_role" name="target_role" style="padding: 8px;">
-            <option value="">-- Select role --</option>
-            {% for role in available_roles %}
-            <option value="{{ role.id }}" {{ 'selected' if selected_role==role.id else '' }}>{{ role.title }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" style="padding: 8px 16px;">Compare</button>
-    </p>
-</form>
+        <header class="flex flex-col gap-6 bg-surface p-8 rounded-2xl border border-border-main shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Role Comparison</h1>
+                <p class="text-text-muted">Analyze the gap between your current expertise and your next target position.
+                </p>
+            </div>
 
-{% if comparison %}
-<h2>Comparison Results</h2>
+            <form method="GET" action="{{ url_for('manager.compare_roles') }}" class="flex flex-wrap items-end gap-4">
+                <div class="flex-1 min-w-[300px] space-y-2">
+                    <label for="target_role" class="text-xs font-black text-text-main uppercase tracking-widest">Select
+                        Target Role</label>
+                    <select id="target_role" name="target_role"
+                        class="w-full bg-background border border-border-main rounded-xl px-4 py-3 text-text-main font-medium focus:ring-2 focus:ring-primary-600 outline-none transition-all">
+                        <option value="">-- Choose a role to compare --</option>
+                        {% for role in available_roles %}
+                        <option value="{{ role.id }}" {{ 'selected' if selected_role==role.id else '' }}>{{ role.title
+                            }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit"
+                    class="px-8 py-3 bg-primary-700 text-text-inverse rounded-xl font-black hover:bg-primary-800 transition-all shadow-lg shadow-primary-900/10 active:scale-95">
+                    Compare Now
+                </button>
+            </form>
+        </header>
 
-<table border="1" cellpadding="10">
-    <tr>
-        <td><strong>Current Role</strong></td>
-        <td>{{ comparison.current_role }}</td>
-    </tr>
-    <tr>
-        <td><strong>Target Role</strong></td>
-        <td>{{ comparison.target_role_title }}</td>
-    </tr>
-    <tr>
-        <td><strong>Readiness Score</strong></td>
-        <td>{{ comparison.readiness_score }}%</td>
-    </tr>
-    <tr>
-        <td><strong>Estimated Time</strong></td>
-        <td>{{ comparison.estimated_time_to_ready }}</td>
-    </tr>
-</table>
+        {% if comparison %}
+        <section class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div
+                class="lg:col-span-3 bg-primary-700 rounded-2xl p-8 text-text-inverse relative overflow-hidden shadow-lg">
+                <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-text-inverse/70 uppercase tracking-widest">Target
+                            Ambition</span>
+                        <h2 class="text-2xl font-black">{{ comparison.target_role_title }}</h2>
+                        <p class="text-sm opacity-80">Currently: {{ comparison.current_role }}</p>
+                    </div>
+                    <div class="flex flex-col items-center justify-center border-x border-text-inverse/20 px-4">
+                        <span class="text-xs font-bold text-text-inverse/70 uppercase mb-2">Readiness</span>
+                        <span class="text-5xl font-black">{{ comparison.readiness_score }}%</span>
+                    </div>
+                    <div class="flex flex-col justify-center text-right">
+                        <span class="text-xs font-bold text-text-inverse/70 uppercase mb-1">Estimated Timeline</span>
+                        <span class="text-xl font-black">{{ comparison.estimated_time_to_ready }}</span>
+                    </div>
+                </div>
+                <span
+                    class="material-symbols-outlined absolute -bottom-8 -right-8 text-[12rem] text-text-inverse/10">compare_arrows</span>
+            </div>
 
-<h3>Required Skills</h3>
-<p>Met: {{ comparison.required_skills.met }}/{{ comparison.required_skills.total }}</p>
+            <div
+                class="bg-surface rounded-2xl p-6 border border-border-main flex flex-col justify-center items-center text-center gap-4">
+                <p class="text-sm font-bold text-text-main">Ready to bridge the gap?</p>
+                <a href="{{ url_for('manager.learning_paths') }}"
+                    class="w-full py-4 bg-primary-100 text-primary-800 rounded-xl font-black text-sm hover:bg-primary-200 transition-all text-center">
+                    Generate Path
+                </a>
+            </div>
+        </section>
 
-{% if comparison.required_skills.met_list %}
-<h4>Skills You Have</h4>
-<ul>
-    {% for skill in comparison.required_skills.met_list %}
-    <li>{{ skill.skill_name }} (Level {{ skill.proficiency }}/5)</li>
-    {% endfor %}
-</ul>
-{% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-{% if comparison.required_skills.missing_list %}
-<h4>Skills You Need</h4>
-<ul style="color: red;">
-    {% for skill in comparison.required_skills.missing_list %}
-    <li>{{ skill }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                <div class="px-8 py-5 border-b border-border-main bg-white flex justify-between items-center">
+                    <h3 class="font-bold text-text-main flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600">verified</span>
+                        Required Skills
+                    </h3>
+                    <span class="text-xs font-black text-text-muted bg-background px-3 py-1 rounded-full">
+                        {{ comparison.required_skills.met }} / {{ comparison.required_skills.total }} Met
+                    </span>
+                </div>
+                <div class="p-8 space-y-6">
+                    {# Skills Met #}
+                    {% if comparison.required_skills.met_list %}
+                    <div class="space-y-3">
+                        <p class="text-[10px] font-black text-primary-700 uppercase tracking-widest">Matched Expertise
+                        </p>
+                        {% for skill in comparison.required_skills.met_list %}
+                        <div
+                            class="flex items-center justify-between p-3 bg-success-50 border border-success-200 rounded-xl">
+                            <span class="text-sm font-bold text-success-800">{{ skill.skill_name }}</span>
+                            <span class="text-[10px] font-black text-success-800">Lvl {{ skill.proficiency }}/5</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
-<h3>Recommended Skills</h3>
-<p>Met: {{ comparison.recommended_skills.met }}/{{ comparison.recommended_skills.total }}</p>
+                    {# Skills Missing #}
+                    {% if comparison.required_skills.missing_list %}
+                    <div class="space-y-3">
+                        <p class="text-[10px] font-black text-danger-800 uppercase tracking-widest">Critical Gaps</p>
+                        {% for skill in comparison.required_skills.missing_list %}
+                        <div
+                            class="flex items-center justify-between p-3 bg-danger-50 border border-danger-200 rounded-xl">
+                            <span class="text-sm font-bold text-danger-800">{{ skill }}</span>
+                            <span class="material-symbols-outlined text-sm text-danger-800">warning</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
 
-{% if comparison.recommended_skills.missing_list %}
-<h4>Nice to Have</h4>
-<ul>
-    {% for skill in comparison.recommended_skills.missing_list %}
-    <li>{{ skill }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                <div class="px-8 py-5 border-b border-border-main bg-white flex justify-between items-center">
+                    <h3 class="font-bold text-text-main flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600">tips_and_updates</span>
+                        Recommended Skills
+                    </h3>
+                </div>
+                <div class="p-8 space-y-6">
+                    <p class="text-xs text-text-muted italic">"Nice-to-have" competencies that would make you a stronger
+                        candidate for this role.</p>
 
-<p>
-    <a href="{{ url_for('manager.learning_paths') }}"
-        style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; display: inline-block; margin-top: 15px;">
-        Generate Learning Path for {{ comparison.target_role_title }}
-    </a>
-</p>
-{% endif %}
+                    {% if comparison.recommended_skills.missing_list %}
+                    <div class="grid grid-cols-1 gap-3">
+                        {% for skill in comparison.recommended_skills.missing_list %}
+                        <div
+                            class="flex items-center gap-3 p-3 bg-background border border-border-main rounded-xl group hover:border-primary-300 transition-all">
+                            <div class="w-2 h-2 rounded-full bg-text-light group-hover:bg-primary-500"></div>
+                            <span class="text-sm font-medium text-text-main">{{ skill }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-6">
+                        <span class="material-symbols-outlined text-primary-600 text-4xl">check_circle</span>
+                        <p class="text-sm text-text-muted mt-2">All recommended skills covered!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
