@@ -2,53 +2,62 @@
 {% block title %} – Manager Dashboard{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-6 px-6 pb-6">
-    <section>
-        <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Welcome, {{current_user.username}}
-        </h1>
-        <p class="text-on-surface-variant font-medium mt-1">Here's what's happening across your team today.</p>
-    </section>
+<div class="px-6 pb-6">
+    <!-- Welcome Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-text-main">Welcome back, {{ current_user.username }}!</h1>
+        <p class="text-text-muted mt-1">Here's what's happening across your team today.</p>
+    </div>
 
-    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-6">
         <!-- Total Projects -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">Total Projects</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.total_projects }}</p>
         </div>
         <!-- Active -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">Active</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.active }}</p>
         </div>
         <!-- Planning -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">Planning</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.planning }}</p>
         </div>
         <!-- Completed -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">Completed</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.completed }}</p>
         </div>
         <!-- On Hold -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">On Hold</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.on_hold }}</p>
         </div>
         <!-- Team Members -->
-        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+        <div
+            class="bg-surface p-6 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200">
             <p class="text-xs font-bold text-text-main uppercase tracking-wider">Team Members</p>
             <p class="text-3xl font-extrabold text-text-main mt-2">{{ stats.total_team_members }}</p>
         </div>
-    </section>
+    </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
         <!-- Table 1: Recent Projects -->
         <section
-            class="xl:col-span-3 bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col hover:shadow-xl">
-            <div class="px-6 py-5 bg-surface-container-low flex justify-between items-center">
-                <h3 class="font-headline font-bold text-lg text-text-main">Recent Projects</h3>
-                <button class="text-secondary font-semibold text-sm hover:underline">View All</button>
+            class="xl:col-span-3 bg-surface rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col">
+            <div class="px-6 py-5 border-b border-border-main flex justify-between items-center">
+                <h3 class="font-bold text-lg text-text-main">Recent Projects</h3>
+                <a href="{{ url_for('manager.list_projects') }}"
+                    class="text-primary-600 font-semibold text-sm hover:underline">View All</a>
             </div>
             <div class="overflow-x-auto">
                 {% if projects %}
@@ -64,46 +73,37 @@
                     </thead>
                     <tbody class="divide-y divide-border-main overflow-hidden">
                         {% for project in projects %}
-                        <tr class="hover:bg-background transition-colors group">
+                        <tr class="hover:bg-background transition-colors duration-150">
                             <td class="px-6 py-5">
-                                <!-- Have to map custom icons and move span-text inside the div as per projects if we need to keep it -->
-                                <!-- <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded bg-emerald-100 flex items-center justify-center text-emerald-700">
-                                        <span class="material-symbols-outlined text-sm"
-                                            data-icon="terminal">terminal</span>
-                                    </div>
-                                </div> -->
-                                <span class="font-semibold text-text-main">{{ project.title }}</span>
+                                <span class="font-medium text-text-main">{{ project.title }}</span>
                             </td>
                             <td class="px-6 py-5 text-center">
-                                <div class="px-3 py-1 w-fit mx-auto rounded-full bg-primary-200">
-                                    <p class="text-sm font-bold text-primary-700 text-center">
-                                        {{ project.status }}</p>
+                                <div class="px-3 py-1 w-fit mx-auto rounded-full bg-primary-100 text-primary-700">
+                                    <p class="text-xs font-medium text-center">{{ project.status }}</p>
                                 </div>
                             </td>
-                            <td class="px-6 py-5 text-on-surface-variant font-medium text-center">{{
+                            <td class="px-6 py-5 text-text-muted font-medium text-center">{{
                                 project.assignments.filter_by(status='active').count() }} Members</td>
                             <td class="px-6 py-5 text-center">
-                                <div class="flex justify-center gap-1">
-                                    <button
-                                        class="p-2 rounded-lg text-text-main hover:text-blue-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                <div class="flex justify-center gap-2">
+                                    <a href="{{ url_for('manager.view_project', project_id=project.id) }}"
+                                        class="p-2 rounded-lg text-text-main hover:text-primary-600 transition-colors duration-150"
                                         title="View">
-                                        <span class="material-symbols-outlined text-xl"
+                                        <span class="material-symbols-outlined text-[20px]"
                                             data-icon="visibility">visibility</span>
-                                    </button>
-                                    <button
-                                        class="p-2 rounded-lg text-text-main hover:text-amber-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                    </a>
+                                    <a href="{{ url_for('manager.project_skills', project_id=project.id) }}"
+                                        class="p-2 rounded-lg text-text-main hover:text-primary-600 transition-colors duration-150"
                                         title="Skills">
-                                        <span class="material-symbols-outlined text-xl"
+                                        <span class="material-symbols-outlined text-[20px]"
                                             data-icon="psychology">psychology</span>
-                                    </button>
-                                    <button
-                                        class="p-2 rounded-lg text-text-main hover:text-green-600 hover:scale-110 hover:cursor-pointer transition-all"
+                                    </a>
+                                    <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
+                                        class="p-2 rounded-lg text-text-main hover:text-primary-600 transition-colors duration-150"
                                         title="Match">
-                                        <span class="material-symbols-outlined text-xl"
+                                        <span class="material-symbols-outlined text-[20px]"
                                             data-icon="join_inner">join_inner</span>
-                                    </button>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -111,25 +111,30 @@
                     </tbody>
                 </table>
                 {% else %}
-                <p class="text-center text-xl text-text-light">No projects yet.
-                    <a href="{{ url_for('manager.create_project') }}"
-                        class="text-blue-400 hover:underline hover:text-blue-600">Create one</a>
-                </p>
+                <div class="p-8 text-center">
+                    <span class="material-symbols-outlined text-text-light text-[48px] mb-2 block">folder_open</span>
+                    <p class="text-sm text-text-muted">No projects yet.</p>
+                    <p class="text-xs text-text-light mt-1">
+                        <a href="{{ url_for('manager.create_project') }}"
+                            class="text-primary-600 hover:underline">Create one</a>
+                    </p>
+                </div>
                 {% endif %}
             </div>
         </section>
+
         <!-- Table 2: Recent Skill Updates -->
         <section
-            class="xl:col-span-2 bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col hover:shadow-xl">
-            <div class="px-6 py-5 bg-surface-container-low">
-                <h3 class="font-headline font-bold text-lg text-on-surface">Recent Skill Updates</h3>
+            class="xl:col-span-2 bg-surface rounded-xl border border-border-main shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col">
+            <div class="px-6 py-5 border-b border-border-main">
+                <h3 class="font-bold text-lg text-text-main">Recent Skill Updates</h3>
             </div>
             <div class="overflow-x-auto">
                 {% if recent_updates %}
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr
-                            class="text-xs font-bold text-on-surface-variant border-b border-background uppercase tracking-wider">
+                            class="text-xs font-bold text-text-muted border-b border-border-main uppercase tracking-wider bg-background">
                             <th class="px-6 py-4 text-left">Employee</th>
                             <th class="px-6 py-4 text-left">Skill</th>
                             <th class="px-6 py-4 text-center">Level</th>
@@ -137,33 +142,37 @@
                             <th class="px-6 py-4 text-center">Updated</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-background">
+                    <tbody class="divide-y divide-border-main">
                         {% for update in recent_updates %}
-                        <tr class="bg-surface hover:bg-background transition-colors">
+                        <tr class="hover:bg-background transition-colors duration-150">
                             <td class="px-6 py-5">
-                                <a class="text-primary-700 font-bold hover:underline" href="#">{{ update.username }}</a>
+                                <a class="text-primary-600 font-medium hover:underline text-sm" href="#">{{
+                                    update.username }}</a>
                             </td>
                             <td class="px-6 py-5">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-sm font-semibold text-text-muted">{{ update.skill_name }}</span>
-                                </div>
+                                <span class="text-sm text-text-main">{{ update.skill_name }}</span>
                             </td>
-                            <td class="text-sm text-center">{{ update.proficiency_level }}/5</td>
+                            <td class="px-6 py-5 text-center text-sm text-text-muted">{{ update.proficiency_level }}/5
+                            </td>
                             <td class="px-6 py-5 text-center">
                                 <span
-                                    class="inline-flex items-center gap-1 text-primary-600 bg-primary-50 px-2 py-0.5 rounded text-[10px] font-black uppercase">
+                                    class="inline-flex items-center text-xs font-medium px-2 py-1 rounded-full
+                                        {% if update.is_verified %}bg-primary-100 text-primary-700{% else %}bg-gray-100 text-gray-700{% endif %}">
                                     {{ 'Yes' if update.is_verified else 'No' }}
                                 </span>
                             </td>
-                            <td class="text-sm text-center px-2">{{ update.updated_at.strftime('%Y-%m-%d %H:%M') if update.updated_at else '-'
-                            }}</td>
+                            <td class="px-6 py-5 text-center text-xs text-text-muted">{{
+                                update.updated_at.strftime('%Y-%m-%d') if update.updated_at else '-' }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 {% else %}
-                <p class="text-center text-xl text-text-light pb-3">No Skill Updates.
-                </p>
+                <div class="p-8 text-center">
+                    <span class="material-symbols-outlined text-text-light text-[48px] mb-2 block">trending_up</span>
+                    <p class="text-sm text-text-muted">No skill updates yet.</p>
+                    <p class="text-xs text-text-light mt-1">Updates will appear here as team members progress</p>
+                </div>
                 {% endif %}
             </div>
         </section>

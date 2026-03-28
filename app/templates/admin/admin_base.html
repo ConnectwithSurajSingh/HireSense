@@ -22,17 +22,35 @@
                     <span class="material-symbols-outlined text-[20px]">dashboard</span>
                     Dashboard
                 </a>
-                <a href="{{ url_for('admin.blacklisted_users') }}"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
-                    {% if active_page == 'Blacklisted Users' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
-                    <span class="material-symbols-outlined text-[20px]">block</span>
-                    Blacklisted Users
-                </a>
                 <a href="{{ url_for('admin.manage_users') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
                     {% if active_page == 'Manage Users' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
                     <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
                     Manage Users
+                </a>
+                <a href="{{ url_for('admin.reset_credentials') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                    {% if active_page == 'Reset Credentials' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
+                    <span class="material-symbols-outlined text-[20px]">lock_reset</span>
+                    Reset Credentials
+                </a>
+                <a href="{{ url_for('admin.list_skills') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                    {% if active_page == 'Skills' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
+                    <span class="material-symbols-outlined text-[20px]">psychology</span>
+                    Skill Catalog
+                </a>
+                <a href="{{ url_for('admin.list_projects') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                    {% if active_page == 'Projects' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
+                    <span class="material-symbols-outlined text-[20px]">folder</span>
+                    Projects
+                </a>
+                <a href="{{ url_for('admin.nlp_stats') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                    {% if active_page == 'NLP Stats' %} bg-primary-900/80 text-primary-400 shadow-sm {% else %} text-text-light hover:bg-primary-900/50 hover:text-text-inverse {% endif %}">
+                    <span class="material-symbols-outlined text-[20px]">analytics</span>
+                    NLP Stats
                 </a>
             </nav>
         </div>

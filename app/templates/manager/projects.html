@@ -2,33 +2,33 @@
 {% block title %} – Projects{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
 
     <section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">My Projects</h1>
+            <h1 class="text-3xl font-extrabold text-text-main tracking-wide">My Projects</h1>
             <p class="text-text-muted">Manage and monitor your ongoing infrastructure initiatives.</p>
         </div>
         <a href="{{ url_for('manager.create_project') }}"
-            class="flex items-center justify-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-primary-700 transition-all active:scale-95">
+            class="flex items-center justify-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:bg-primary-700 transition-all active:scale-95">
             <span class="material-symbols-outlined">add</span>
             Create New Project
         </a>
     </section>
 
-    <!-- <div class="py-8 px-6 bg-surface rounded-2xl border border-border-main shadow-sm">
+    <!-- <div class="py-8 px-6 bg-surface rounded-xl border border-border-main shadow-sm">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div class="space-y-4">
                 <div class="flex items-center gap-3">
                     <span
                         class="px-3 py-1 bg-primary-100 text-primary-600 text-xs font-bold rounded-full uppercase tracking-wider">Featured
                         Project</span>
-                    <span class="text-on-surface-variant text-sm flex items-center gap-1">
+                    <span class="text-text-muted text-sm flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">calendar_today</span>
                         Global Infrastructure 2.0
                     </span>
                 </div>
-                <h2 class="text-4xl font-black text-text-main tracking-tight">Infrastructure Expansion</h2>
+                <h2 class="text-4xl font-extrabold text-text-main tracking-tight">Infrastructure Expansion</h2>
                 <p class="text-text-muted max-w-2xl text-lg">Scaling cloud operations across EMEA regions with a focus
                     on localized data compliance.</p>
             </div>
@@ -46,7 +46,7 @@
         </div>
     </div> -->
 
-    <nav class="flex items-center justify-between w-full gap-2 bg-surface p-1.5 rounded-xl border border-border-main shadow-sm hover:shadow-lg">
+    <nav class="flex items-center justify-between w-full gap-2 bg-surface p-1.5 rounded-xl border border-border-main shadow-sm hover:shadow-md">
         {% set statuses = [('All', None), ('Planning', 'planning'), ('Active', 'active'), ('Completed', 'completed'),
         ('On Hold', 'on_hold')] %}
         {% for label, status_val in statuses %}
@@ -57,7 +57,7 @@
         {% endfor %}
     </nav>
 
-    <div class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+    <div class="bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -89,7 +89,7 @@
                             </div>
                         </td>
                         <td class="py-5 px-6 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-tighter
+                            <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-tighter
                                     {% if project.status == 'active' %} bg-green-100 text-green-700 
                                     {% elif project.status == 'planning' %} bg-blue-100 text-blue-700
                                     {% else %} bg-gray-100 text-gray-700 {% endif %}">

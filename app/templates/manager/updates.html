@@ -2,10 +2,10 @@
 {% block title %} – Recent Updates{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
         <header>
-            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Recent Updates</h1>
+            <h1 class="text-3xl font-extrabold text-text-main tracking-wide">Recent Updates</h1>
             <p class="text-text-muted">Real-time feed of employee skill advancements and profile changes.</p>
         </header>
 
@@ -30,7 +30,7 @@
             </div>
         </section>
 
-        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+        <section class="bg-surface rounded-xl shadow-sm border border-border-main overflow-hidden">
             <div class="bg-surface px-8 py-5 border-b border-border-main">
                 <h2 class="text-xl font-bold text-text-main">Activity Log</h2>
             </div>
@@ -160,15 +160,14 @@
 
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12">
             <div
-                class="md:col-span-2 bg-primary-700 p-8 rounded-2xl relative overflow-hidden group shadow-lg shadow-primary-900/10">
-                <div class="relative z-10 text-text-inverse">
+                class="md:col-span-2 bg-primary-700 p-8 rounded-xl relative overflow-hidden group shadow-md                <div class="relative z-10 text-text-inverse">
                     <h3 class="font-headline text-xl font-bold mb-2">Weekly Summary</h3>
                     <p class="text-text-inverse/80 text-sm max-w-md font-medium">
                         HireSense has processed all recent employee changes. Keep profiles updated to ensure accurate
                         project matching.
                     </p>
                     <button
-                        class="mt-6 px-6 py-2 bg-surface text-primary-700 rounded-xl text-sm font-black hover:bg-primary-50 transition-all">
+                        class="mt-6 px-6 py-2 bg-surface text-primary-700 rounded-xl text-sm font-extrabold hover:bg-primary-50 transition-all">
                         Download Weekly Report
                     </button>
                 </div>
@@ -176,7 +175,7 @@
                     class="material-symbols-outlined absolute -bottom-6 -right-6 text-[10rem] text-text-inverse/10 opacity-50 group-hover:scale-110 transition-transform duration-500">monitoring</span>
             </div>
 
-            <div class="bg-surface p-6 rounded-2xl border border-border-main shadow-sm flex flex-col justify-between">
+            <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-text-main font-bold">Alert Settings</h3>

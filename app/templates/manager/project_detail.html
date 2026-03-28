@@ -2,7 +2,7 @@
 {% block title %} – {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
 
         <nav class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -28,11 +28,11 @@
             </div>
         </nav>
 
-        <header class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm relative overflow-hidden">
+        <header class="bg-surface p-8 rounded-xl border border-border-main shadow-sm relative overflow-hidden">
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-4">
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest 
+                        <span class="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest 
                             {% if project.status == 'active' %} bg-success-50 text-success-800 
                             {% elif project.status == 'planning' %} bg-info-50 text-info-800 
                             {% else %} bg-background text-text-muted {% endif %}">
@@ -41,15 +41,15 @@
                         <span class="text-text-light text-xs font-bold uppercase tracking-tighter">Created {{
                             project.created_at.strftime('%b %d, %Y') }}</span>
                     </div>
-                    <h1 class="text-4xl font-black text-text-main tracking-tight">{{ project.title }}</h1>
+                    <h1 class="text-4xl font-extrabold text-text-main tracking-tight">{{ project.title }}</h1>
                     <p class="text-text-muted text-lg leading-relaxed max-w-3xl">
                         {{ project.description or 'No project description provided.' }}
                     </p>
                 </div>
 
-                <div class="bg-background rounded-2xl p-6 flex flex-col justify-center gap-4 border border-border-main">
+                <div class="bg-background rounded-xl p-6 flex flex-col justify-center gap-4 border border-border-main">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-black text-text-muted uppercase">Timeline</span>
+                        <span class="text-xs font-extrabold text-text-muted uppercase">Timeline</span>
                         <span class="material-symbols-outlined text-primary-600 text-sm">calendar_month</span>
                     </div>
                     <div class="space-y-1">
@@ -64,11 +64,11 @@
 
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
-            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden flex flex-col">
+            <section class="bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col">
                 <div class="px-8 py-5 border-b border-border-main flex items-center justify-between">
                     <h2 class="text-xl font-bold text-text-main">Required Skills ({{ skill_requirements|length }})</h2>
                     <a href="{{ url_for('manager.project_skills', project_id=project.id) }}"
-                        class="text-xs font-black text-primary-700 hover:underline uppercase tracking-widest">Update
+                        class="text-xs font-extrabold text-primary-700 hover:underline uppercase tracking-widest">Update
                         Specs</a>
                 </div>
 
@@ -92,11 +92,11 @@
                                 <td class="px-8 py-5 text-sm text-text-muted">{{ skill.category or '-' }}</td>
                                 <td class="px-8 py-5">
                                     <span
-                                        class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter {{ 'bg-danger-50 text-danger-800' if skill.is_mandatory else 'bg-primary-50 text-primary-700' }}">
+                                        class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-tighter {{ 'bg-danger-50 text-danger-800' if skill.is_mandatory else 'bg-primary-50 text-primary-700' }}">
                                         {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
                                     </span>
                                 </td>
-                                <td class="px-8 py-5 text-right font-black text-text-main">{{ skill.minimum_proficiency
+                                <td class="px-8 py-5 text-right font-extrabold text-text-main">{{ skill.minimum_proficiency
                                     }}/5</td>
                             </tr>
                             {% endfor %}
@@ -111,11 +111,11 @@
                 </div>
             </section>
 
-            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden flex flex-col">
+            <section class="bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden flex flex-col">
                 <div class="px-8 py-5 border-b border-border-main flex items-center justify-between">
                     <h2 class="text-xl font-bold text-text-main">Team Roster ({{ team|length }})</h2>
                     <a href="{{ url_for('manager.project_team', project_id=project.id) }}"
-                        class="text-xs font-black text-primary-700 hover:underline uppercase tracking-widest">Full
+                        class="text-xs font-extrabold text-primary-700 hover:underline uppercase tracking-widest">Full
                         Team</a>
                 </div>
 
@@ -138,7 +138,7 @@
                                 <td class="px-8 py-5">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[10px] font-black">
+                                            class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[10px] font-extrabold">
                                             {{ member.username[:2] | upper }}
                                         </div>
                                         <div class="flex flex-col">

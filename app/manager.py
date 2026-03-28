@@ -457,12 +457,42 @@ def my_skills():
     added_skill_ids = {s["skill_id"] for s in skills}
     available_skills = [s for s in all_skills if s.id not in added_skill_ids]
 
+    # Calculate skill distribution by category
+    skill_distribution = _calculate_skill_distribution(skills)
+
     return render_template(
         "manager/skills.html",
         skills=skills,
         available_skills=available_skills,
+        skill_distribution=skill_distribution,
         active_page="My Skills"
     )
+
+
+def _calculate_skill_distribution(skills):
+    """Calculate skill distribution percentages by category."""
+    if not skills:
+        return {"technical": 0, "soft": 0, "domain": 0}
+
+    # Group skills by category
+    categories = {"technical": [], "soft": [], "domain": []}
+    for skill in skills:
+        category = (skill.get("category") or "technical").lower()
+        if category in categories:
+            categories[category].append(skill["proficiency_level"])
+        else:
+            categories["technical"].append(skill["proficiency_level"])
+
+    # Calculate average proficiency percentage (out of 5, convert to %)
+    distribution = {}
+    for cat, levels in categories.items():
+        if levels:
+            avg = sum(levels) / len(levels)
+            distribution[cat] = int((avg / 5) * 100)
+        else:
+            distribution[cat] = 0
+
+    return distribution
 
 
 @manager_bp.route("/skills/add", methods=["POST"])
@@ -565,10 +595,12 @@ def view_learning_path(path_id):
     import json
     content = json.loads(path.generated_content) if path.generated_content else {}
 
+    progress = LearningPathService.get_path_progress(path)
     return render_template(
         "manager/learning_path_detail.html",
         path=path,
         content=content,
+        progress=progress,
     )
 
 

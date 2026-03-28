@@ -250,15 +250,21 @@
                             </div>
                         </div>
 
-                        <!-- Static Progress Bar -->
+                        <!-- Dynamic Progress Bar -->
                         <div class="mt-4">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-medium text-text-muted">Progress</span>
-                                <span class="text-xs font-bold text-primary-700">35%</span>
+                                <span class="text-xs font-bold text-primary-700">{{ path_progress.percentage if
+                                    path_progress else 0 }}%</span>
                             </div>
                             <div class="w-full bg-background h-2 rounded-full overflow-hidden">
-                                <div class="bg-primary-600 h-full w-[35%] transition-all duration-500"></div>
+                                <div class="bg-primary-600 h-full transition-all duration-500"
+                                    style="width: {{ path_progress.percentage if path_progress else 0 }}%;"></div>
                             </div>
+                            {% if path_progress %}
+                            <p class="text-xs text-text-muted mt-2">{{ path_progress.completed }}/{{ path_progress.total
+                                }} skills completed</p>
+                            {% endif %}
                         </div>
                     </div>
 

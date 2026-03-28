@@ -2,7 +2,7 @@
 {% block title %} – Match Employees for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
 
         <nav class="flex items-center gap-4">
@@ -19,14 +19,14 @@
             </a>
         </nav>
 
-        <header class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm relative overflow-hidden">
+        <header class="bg-surface p-8 rounded-xl border border-border-main shadow-sm relative overflow-hidden">
             <div class="relative z-10 space-y-2">
                 <div class="flex items-center gap-3">
                     <span
-                        class="px-3 py-1 bg-primary-700 text-text-inverse text-[10px] font-black uppercase rounded-full tracking-widest">Resource
+                        class="px-3 py-1 bg-primary-700 text-text-inverse text-[10px] font-extrabold uppercase rounded-full tracking-widest">Resource
                         Allocation</span>
                 </div>
-                <h1 class="text-4xl font-black text-text-main tracking-tight">Find Matches: {{ project.title }}</h1>
+                <h1 class="text-4xl font-extrabold text-text-main tracking-tight">Find Matches: {{ project.title }}</h1>
             </div>
             <span
                 class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-text-light/10">person_search</span>
@@ -35,9 +35,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
             <aside class="lg:col-span-1 space-y-6">
-                <section class="bg-surface rounded-2xl border border-border-main p-6 shadow-sm">
+                <section class="bg-surface rounded-xl border border-border-main p-6 shadow-sm">
                     <h3
-                        class="text-sm font-black text-text-main uppercase tracking-widest mb-4 flex items-center gap-2">
+                        class="text-sm font-extrabold text-text-main uppercase tracking-widest mb-4 flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary-600 text-sm">checklist</span>
                         Required Skills
                     </h3>
@@ -49,7 +49,7 @@
                             <p class="text-sm font-bold text-text-main">{{ skill.skill_name }}</p>
                             <div class="flex items-center justify-between mt-1">
                                 <span
-                                    class="text-[10px] font-black uppercase {% if skill.is_mandatory %}text-danger-800{% else %}text-text-muted{% endif %}">
+                                    class="text-[10px] font-extrabold uppercase {% if skill.is_mandatory %}text-danger-800{% else %}text-text-muted{% endif %}">
                                     {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
                                 </span>
                                 <span class="text-[10px] font-bold text-primary-700">Lvl {{ skill.minimum_proficiency
@@ -67,7 +67,7 @@
             </aside>
 
             <main class="lg:col-span-3 space-y-6">
-                <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+                <section class="bg-surface rounded-xl shadow-sm border border-border-main overflow-hidden">
                     <div class="bg-surface px-8 py-5 border-b border-border-main flex justify-between items-center">
                         <h2 class="text-xl font-bold text-text-main">Top Talent Matches ({{ matches|length }})</h2>
                     </div>
@@ -92,7 +92,7 @@
                                     <td class="px-8 py-6">
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-black text-xs">
+                                                class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-extrabold text-xs">
                                                 {{ match.username[:2] | upper }}
                                             </div>
                                             <div class="flex flex-col">
@@ -108,7 +108,7 @@
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         <div class="flex flex-col items-center">
-                                            <span class="text-lg font-black text-primary-700">{{ match.match_score
+                                            <span class="text-lg font-extrabold text-primary-700">{{ match.match_score
                                                 }}</span>
                                             <span class="text-[10px] text-text-light font-bold uppercase">Points</span>
                                         </div>
@@ -117,13 +117,13 @@
                                         <div class="flex flex-col gap-2 items-center">
                                             {% if match.mandatory_met %}
                                             <span
-                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-black uppercase">
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-extrabold uppercase">
                                                 <span class="material-symbols-outlined text-xs">check_circle</span> All
                                                 Mandatory Met
                                             </span>
                                             {% else %}
                                             <span
-                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-danger-50 text-danger-800 text-[10px] font-black uppercase">
+                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-danger-50 text-danger-800 text-[10px] font-extrabold uppercase">
                                                 <span class="material-symbols-outlined text-xs">cancel</span> Missing
                                                 Critical
                                             </span>
@@ -141,7 +141,7 @@
                                             <input type="text" name="role_in_project" placeholder="Role..."
                                                 class="w-24 bg-background border border-border-main rounded-lg px-2 py-1.5 text-xs focus:ring-1 focus:ring-primary-600 outline-none">
                                             <button type="submit"
-                                                class="bg-primary-700 text-text-inverse px-4 py-1.5 rounded-lg text-xs font-black hover:bg-primary-800 transition-all active:scale-95">
+                                                class="bg-primary-700 text-text-inverse px-4 py-1.5 rounded-lg text-xs font-extrabold hover:bg-primary-800 transition-all active:scale-95">
                                                 Assign
                                             </button>
                                         </form>

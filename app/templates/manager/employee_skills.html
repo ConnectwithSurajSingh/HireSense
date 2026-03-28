@@ -2,7 +2,7 @@
 {% block title %} – Employee Skills{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
 
         <nav>
@@ -15,13 +15,13 @@
         </nav>
 
         <header
-            class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm flex flex-col md:flex-row gap-8 items-center">
+            class="bg-surface p-8 rounded-xl border border-border-main shadow-sm flex flex-col md:flex-row gap-8 items-center">
             <div
-                class="w-24 h-24 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-3xl font-black border-4 border-background shadow-sm shrink-0">
+                class="w-24 h-24 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-3xl font-extrabold border-4 border-background shadow-sm shrink-0">
                 {{ employee.username[:2] | upper }}
             </div>
             <div class="flex-1 text-center md:text-left space-y-2">
-                <h1 class="text-3xl font-black text-text-main tracking-tight">{{ employee.username }}</h1>
+                <h1 class="text-3xl font-extrabold text-text-main tracking-tight">{{ employee.username }}</h1>
                 <div class="flex flex-wrap justify-center md:justify-start gap-4">
                     <span class="flex items-center gap-1 text-text-muted font-medium">
                         <span class="material-symbols-outlined text-sm">mail</span> {{ employee.email }}
@@ -38,7 +38,7 @@
             </div>
         </header>
 
-        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+        <section class="bg-surface rounded-xl shadow-sm border border-border-main overflow-hidden">
             <div class="bg-surface px-8 py-5 border-b border-border-main flex justify-between items-center">
                 <h2 class="text-xl font-bold text-text-main">Skill Inventory ({{ skills|length }})</h2>
             </div>
@@ -75,14 +75,14 @@
                                         </div>
                                         {% endfor %}
                                     </div>
-                                    <span class="text-sm font-black text-text-main">{{ skill.proficiency_level
+                                    <span class="text-sm font-extrabold text-text-main">{{ skill.proficiency_level
                                         }}/5</span>
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-center">
                                 {% if skill.is_verified %}
                                 <span
-                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-black uppercase">
+                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-extrabold uppercase">
                                     <span class="material-symbols-outlined text-xs">verified</span> Verified
                                 </span>
                                 {% else %}
@@ -96,7 +96,7 @@
                                     action="{{ url_for('manager.verify_employee_skill', user_id=employee.id) }}">
                                     <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
                                     <button type="submit"
-                                        class="px-4 py-1.5 bg-primary-700 text-text-inverse rounded-lg text-xs font-black hover:bg-primary-800 transition-all shadow-sm active:scale-95">
+                                        class="px-4 py-1.5 bg-primary-700 text-text-inverse rounded-lg text-xs font-extrabold hover:bg-primary-800 transition-all shadow-sm active:scale-95">
                                         Verify Skill
                                     </button>
                                 </form>

@@ -76,11 +76,17 @@ def dashboard():
     active_path = LearningPathService.get_active_learning_path(current_user.id)
     resume      = ResumeService.get_user_resume(current_user.id)
 
+    # Calculate learning path progress
+    path_progress = None
+    if active_path:
+        path_progress = LearningPathService.get_path_progress(active_path)
+
     return render_template(
         "employee/dashboard.html",
         assignments=assignments,
         skills=skills,
         active_path=active_path,
+        path_progress=path_progress,
         resume=resume,
     )
 
@@ -303,11 +309,41 @@ def my_skills():
     added_skill_ids = {s["skill_id"] for s in skills}
     available       = [s for s in all_skills if s.id not in added_skill_ids]
 
+    # Calculate skill distribution by category
+    skill_distribution = _calculate_skill_distribution(skills)
+
     return render_template(
         "employee/skills.html",
         skills=skills,
         available_skills=available,
+        skill_distribution=skill_distribution,
     )
+
+
+def _calculate_skill_distribution(skills):
+    """Calculate skill distribution percentages by category."""
+    if not skills:
+        return {"technical": 0, "soft": 0, "domain": 0}
+
+    # Group skills by category
+    categories = {"technical": [], "soft": [], "domain": []}
+    for skill in skills:
+        category = (skill.get("category") or "technical").lower()
+        if category in categories:
+            categories[category].append(skill["proficiency_level"])
+        else:
+            categories["technical"].append(skill["proficiency_level"])
+
+    # Calculate average proficiency percentage (out of 5, convert to %)
+    distribution = {}
+    for cat, levels in categories.items():
+        if levels:
+            avg = sum(levels) / len(levels)
+            distribution[cat] = int((avg / 5) * 100)
+        else:
+            distribution[cat] = 0
+
+    return distribution
 
 
 @employee_bp.route("/skills/add", methods=["POST"])

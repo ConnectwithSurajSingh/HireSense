@@ -36,7 +36,7 @@ from flask import (
 from flask_login import current_user, login_required
 
 from app import db
-from app.models import Notification, Resume, User
+from app.models import Notification, Project, Resume, Skill, User, UserSkill
 from app.services.resume_service import ResumeService
 
 logger = logging.getLogger(__name__)
@@ -118,10 +118,62 @@ def dashboard():
     pending_users = query.all()
     total_users   = User.query.filter_by(is_approved=True, is_blacklisted=False).count()
 
+    # Calculate dynamic stats
+    active_projects = Project.query.filter_by(status="active").count()
+
+    # Calculate skill gaps: count users missing skills or with low proficiency
+    # A skill gap = (total skills * employees) - actual user skills with proficiency >= 3
+    total_skills = Skill.query.count()
+    total_employees = User.query.filter_by(role="employee", is_approved=True).count()
+    proficient_user_skills = UserSkill.query.filter(UserSkill.proficiency_level >= 3).count()
+    potential_skills = total_skills * total_employees if total_employees > 0 else 0
+    skill_gaps = max(0, potential_skills - proficient_user_skills)
+
+    # Get recent active users for the User Lifecycle widget
+    recent_users = (
+        User.query
+        .filter_by(is_approved=True, is_blacklisted=False)
+        .filter(User.id != current_user.id)
+        .order_by(User.updated_at.desc())
+        .limit(10)
+        .all()
+    )
+
+    # Calculate engagement metrics for each user
+    user_lifecycle = []
+    for user in recent_users:
+        # Calculate months active
+        months_active = max(1, (datetime.utcnow() - user.created_at).days // 30)
+
+        # Calculate engagement score based on skills and activity
+        user_skill_count = UserSkill.query.filter_by(user_id=user.id).count()
+        verified_skills = UserSkill.query.filter_by(user_id=user.id, is_verified=True).count()
+
+        # Simple engagement score: based on skill count and verification
+        engagement_score = min(100, (user_skill_count * 10) + (verified_skills * 20))
+
+        user_lifecycle.append({
+            "user": user,
+            "months_active": months_active,
+            "engagement_score": engagement_score,
+        })
+
+    # Get NLP/Resume parsing stats for AI Model Status widget
+    all_resumes = Resume.query.all()
+    total_resumes = len(all_resumes)
+    parsed_resumes = sum(1 for r in all_resumes if r.parsed_content)
+    nlp_success_rate = round((parsed_resumes / total_resumes * 100), 1) if total_resumes > 0 else 0
+
     return render_template(
         "admin/dashboard.html",
         pending_users=pending_users,
         total_users=total_users,
+        active_projects=active_projects,
+        skill_gaps=skill_gaps,
+        user_lifecycle=user_lifecycle,
+        nlp_success_rate=nlp_success_rate,
+        total_resumes=total_resumes,
+        parsed_resumes=parsed_resumes,
         active_page="Dashboard",
         search_query=search_query,
     )
@@ -538,36 +590,226 @@ def force_logout(user_id):
 
 
 # ---------------------------------------------------------------------------
-# Blacklist management
+# ---------------------------------------------------------------------------
+# Global Skill Catalog Management
 # ---------------------------------------------------------------------------
 
-
-@admin_bp.route("/blacklisted")
+@admin_bp.route("/skills")
 @admin_required
-def blacklisted_users():
-    """List all blacklisted users."""
-    users = (
-        User.query.filter_by(is_blacklisted=True)
-        .order_by(User.updated_at.desc())
-        .all()
-    )
+def list_skills():
+    """List all skills in the catalog."""
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+    search = request.args.get("q", "").strip()
+    category_filter = request.args.get("category", "")
+
+    query = Skill.query
+
+    if search:
+        query = query.filter(Skill.name.ilike(f"%{search}%"))
+    if category_filter:
+        query = query.filter(Skill.category == category_filter)
+
+    query = query.order_by(Skill.name.asc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # Get counts for stats
+    total_skills = Skill.query.count()
+    technical_count = Skill.query.filter_by(category="technical").count()
+    soft_count = Skill.query.filter_by(category="soft").count()
+    domain_count = Skill.query.filter_by(category="domain").count()
+
     return render_template(
-        "admin/blacklisted_users.html",
-        users=users,
-        active_page="Blacklisted Users",
+        "admin/skills.html",
+        skills=pagination.items,
+        pagination=pagination,
+        total_skills=total_skills,
+        technical_count=technical_count,
+        soft_count=soft_count,
+        domain_count=domain_count,
+        search=search,
+        category_filter=category_filter,
+        active_page="Skills",
     )
 
 
-@admin_bp.route("/whitelist/<int:user_id>", methods=["POST"])
+@admin_bp.route("/skills/add", methods=["GET", "POST"])
 @admin_required
-def whitelist_user(user_id):
-    """Remove a user from the blacklist and reactivate their account."""
-    user = db.session.get(User, user_id)
-    if user is None:
+def add_skill():
+    """Add a new skill to the catalog."""
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        category = request.form.get("category", "technical")
+
+        if not name:
+            flash("Skill name is required.", "danger")
+            return render_template(
+                "admin/skill_form.html",
+                skill=None,
+                active_page="Skills",
+            )
+
+        # Check for duplicate
+        existing = Skill.query.filter(Skill.name.ilike(name)).first()
+        if existing:
+            flash(f"Skill '{name}' already exists.", "danger")
+            return render_template(
+                "admin/skill_form.html",
+                skill=None,
+                active_page="Skills",
+            )
+
+        skill = Skill(name=name, category=category)
+        db.session.add(skill)
+        db.session.commit()
+        notify_admin(f"Skill '{name}' added to catalog.", "success")
+        return redirect(url_for("admin.list_skills"))
+
+    return render_template(
+        "admin/skill_form.html",
+        skill=None,
+        active_page="Skills",
+    )
+
+
+@admin_bp.route("/skills/<int:skill_id>/edit", methods=["GET", "POST"])
+@admin_required
+def edit_skill(skill_id):
+    """Edit an existing skill."""
+    skill = db.session.get(Skill, skill_id)
+    if skill is None:
         abort(404)
 
-    user.is_blacklisted = False
-    user.is_active      = True
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        category = request.form.get("category", "technical")
+
+        if not name:
+            flash("Skill name is required.", "danger")
+            return render_template(
+                "admin/skill_form.html",
+                skill=skill,
+                active_page="Skills",
+            )
+
+        # Check for duplicate (excluding current skill)
+        existing = Skill.query.filter(
+            Skill.name.ilike(name),
+            Skill.id != skill_id
+        ).first()
+        if existing:
+            flash(f"Skill '{name}' already exists.", "danger")
+            return render_template(
+                "admin/skill_form.html",
+                skill=skill,
+                active_page="Skills",
+            )
+
+        skill.name = name
+        skill.category = category
+        db.session.commit()
+        notify_admin(f"Skill '{name}' updated.", "success")
+        return redirect(url_for("admin.list_skills"))
+
+    return render_template(
+        "admin/skill_form.html",
+        skill=skill,
+        active_page="Skills",
+    )
+
+
+@admin_bp.route("/skills/<int:skill_id>/delete", methods=["POST"])
+@admin_required
+def delete_skill(skill_id):
+    """Delete a skill from the catalog."""
+    skill = db.session.get(Skill, skill_id)
+    if skill is None:
+        abort(404)
+
+    skill_name = skill.name
+    db.session.delete(skill)
     db.session.commit()
-    notify_admin(f"User '{user.username}' whitelisted.", "success")
-    return redirect(url_for("admin.manage_users"))
+    notify_admin(f"Skill '{skill_name}' deleted from catalog.", "danger")
+    return redirect(url_for("admin.list_skills"))
+
+
+# ---------------------------------------------------------------------------
+# System-Wide Project Oversight
+# ---------------------------------------------------------------------------
+
+@admin_bp.route("/projects")
+@admin_required
+def list_projects():
+    """List all projects in the system (regardless of manager)."""
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+    search = request.args.get("q", "").strip()
+    status_filter = request.args.get("status", "")
+
+    query = Project.query
+
+    if search:
+        query = query.filter(Project.title.ilike(f"%{search}%"))
+    if status_filter:
+        query = query.filter(Project.status == status_filter)
+
+    query = query.order_by(Project.created_at.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # Get counts for stats
+    total_projects = Project.query.count()
+    planning_count = Project.query.filter_by(status="planning").count()
+    active_count = Project.query.filter_by(status="active").count()
+    completed_count = Project.query.filter_by(status="completed").count()
+    on_hold_count = Project.query.filter_by(status="on_hold").count()
+
+    return render_template(
+        "admin/projects.html",
+        projects=pagination.items,
+        pagination=pagination,
+        total_projects=total_projects,
+        planning_count=planning_count,
+        active_count=active_count,
+        completed_count=completed_count,
+        on_hold_count=on_hold_count,
+        search=search,
+        status_filter=status_filter,
+        active_page="Projects",
+    )
+
+
+@admin_bp.route("/projects/<int:project_id>")
+@admin_required
+def view_project(project_id):
+    """View details of a specific project."""
+    project = db.session.get(Project, project_id)
+    if project is None:
+        abort(404)
+
+    # Get project skills and assignments
+    required_skills = project.required_skills.all()
+    assignments = project.assignments.all()
+
+    return render_template(
+        "admin/project_detail.html",
+        project=project,
+        required_skills=required_skills,
+        assignments=assignments,
+        active_page="Projects",
+    )
+
+
+@admin_bp.route("/projects/<int:project_id>/delete", methods=["POST"])
+@admin_required
+def force_delete_project(project_id):
+    """Force-delete a project from the system."""
+    project = db.session.get(Project, project_id)
+    if project is None:
+        abort(404)
+
+    project_title = project.title
+    manager_name = project.manager.username if project.manager else "Unknown"
+    db.session.delete(project)
+    db.session.commit()
+    notify_admin(f"Project '{project_title}' (Manager: {manager_name}) force-deleted.", "danger")
+    return redirect(url_for("admin.list_projects"))

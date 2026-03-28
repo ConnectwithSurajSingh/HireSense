@@ -2,7 +2,7 @@
 {% block title %} – Skills for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
 
         <nav>
@@ -15,7 +15,7 @@
         </nav>
 
         <header>
-            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Skill Requirements</h1>
+            <h1 class="text-3xl font-extrabold text-text-main tracking-wide">Skill Requirements</h1>
             <p class="text-text-muted">Define the technical DNA required for this project to ensure accurate employee
                 matching.</p>
         </header>
@@ -23,7 +23,7 @@
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
 
             <div class="xl:col-span-2 space-y-6">
-                <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+                <section class="bg-surface rounded-xl shadow-sm border border-border-main overflow-hidden">
                     <div class="bg-surface px-8 py-5 border-b border-border-main">
                         <h2 class="text-xl font-bold text-text-main">Active Requirements ({{ skill_requirements|length
                             }})</h2>
@@ -50,13 +50,13 @@
                                     <td class="px-8 py-5 text-sm text-text-muted">{{ skill.category or '-' }}</td>
                                     <td class="px-8 py-5">
                                         <span
-                                            class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
+                                            class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest
                                                 {{ 'bg-danger-50 text-danger-800' if skill.is_mandatory else 'bg-primary-50 text-primary-700' }}">
                                             {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
                                         </span>
                                     </td>
                                     <td class="px-8 py-5 text-center">
-                                        <span class="text-sm font-black text-text-main">{{ skill.minimum_proficiency
+                                        <span class="text-sm font-extrabold text-text-main">{{ skill.minimum_proficiency
                                             }}/5</span>
                                     </td>
                                     <td class="px-8 py-5 text-right">
@@ -85,7 +85,7 @@
             </div>
 
             <div class="space-y-6">
-                <section class="bg-surface rounded-2xl shadow-sm border border-border-main p-8">
+                <section class="bg-surface rounded-xl shadow-sm border border-border-main p-8">
                     <h3 class="text-xl font-bold text-text-main mb-6 flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary-600">assignment_add</span>
                         Add Requirement
@@ -96,7 +96,7 @@
                         class="space-y-6">
                         <div class="space-y-2">
                             <label for="skill_id"
-                                class="text-sm font-black text-text-main uppercase tracking-wider">Target Skill</label>
+                                class="text-sm font-extrabold text-text-main uppercase tracking-wider">Target Skill</label>
                             <select id="skill_id" name="skill_id" required
                                 class="w-full bg-background border border-border-main rounded-xl px-4 py-3 text-text-main font-medium focus:ring-2 focus:ring-primary-600 outline-none transition-all cursor-pointer">
                                 <option value="">-- Select from Catalog --</option>
@@ -109,7 +109,7 @@
 
                         <div class="space-y-2">
                             <label for="minimum_proficiency"
-                                class="text-sm font-black text-text-main uppercase tracking-wider">Minimum
+                                class="text-sm font-extrabold text-text-main uppercase tracking-wider">Minimum
                                 Proficiency</label>
                             <select id="minimum_proficiency" name="minimum_proficiency"
                                 class="w-full bg-background border border-border-main rounded-xl px-4 py-3 text-text-main font-medium focus:ring-2 focus:ring-primary-600 outline-none transition-all cursor-pointer">
@@ -132,7 +132,7 @@
                         </label>
 
                         <button type="submit"
-                            class="w-full py-4 bg-primary-700 text-text-inverse rounded-xl font-black text-lg hover:bg-primary-800 shadow-lg shadow-primary-900/10 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            class="w-full py-4 bg-primary-700 text-text-inverse rounded-xl font-extrabold text-lg hover:bg-primary-800 shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined">add</span>
                             Add Requirement
                         </button>
@@ -145,7 +145,7 @@
                     {% endif %}
                 </section>
 
-                <div class="bg-primary-900 p-6 rounded-2xl text-text-inverse relative overflow-hidden group shadow-lg">
+                <div class="bg-primary-900 p-6 rounded-xl text-text-inverse relative overflow-hidden group shadow-md">
                     <div class="relative z-10">
                         <h4 class="font-bold mb-2 flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">lightbulb</span>

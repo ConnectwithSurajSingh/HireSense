@@ -241,36 +241,41 @@
                     <div class="flex justify-between items-end mb-2">
                         <span
                             class="text-sm font-bold text-text-main group-hover:text-primary-600 transition-colors">Technical
-                            Mastery</span>
-                        <span class="text-sm font-extrabold text-text-main">75%</span>
+                            Skills</span>
+                        <span class="text-sm font-extrabold text-text-main">{{ skill_distribution.technical|default(0)
+                            }}%</span>
                     </div>
                     <div class="w-full bg-background border border-border-main rounded-full h-2.5 overflow-hidden">
-                        <div class="bg-primary-600 h-full rounded-full w-0 transition-all duration-1000 ease-out"
-                            style="width: 75%"></div>
+                        <div class="bg-primary-600 h-full rounded-full transition-all duration-1000 ease-out"
+                            style="width: {{ skill_distribution.technical|default(0) }}%"></div>
                     </div>
                 </div>
 
                 <div class="group cursor-default">
                     <div class="flex justify-between items-end mb-2">
                         <span
-                            class="text-sm font-bold text-text-main group-hover:text-primary-600 transition-colors">Leadership</span>
-                        <span class="text-sm font-extrabold text-text-main">40%</span>
+                            class="text-sm font-bold text-text-main group-hover:text-primary-600 transition-colors">Soft
+                            Skills</span>
+                        <span class="text-sm font-extrabold text-text-main">{{ skill_distribution.soft|default(0)
+                            }}%</span>
                     </div>
                     <div class="w-full bg-background border border-border-main rounded-full h-2.5 overflow-hidden">
-                        <div class="bg-primary-500 h-full rounded-full w-0 transition-all duration-1000 ease-out delay-100"
-                            style="width: 40%"></div>
+                        <div class="bg-primary-500 h-full rounded-full transition-all duration-1000 ease-out delay-100"
+                            style="width: {{ skill_distribution.soft|default(0) }}%"></div>
                     </div>
                 </div>
 
                 <div class="group cursor-default">
                     <div class="flex justify-between items-end mb-2">
                         <span
-                            class="text-sm font-bold text-text-main group-hover:text-primary-600 transition-colors">Architecture</span>
-                        <span class="text-sm font-extrabold text-text-main">60%</span>
+                            class="text-sm font-bold text-text-main group-hover:text-primary-600 transition-colors">Domain
+                            Knowledge</span>
+                        <span class="text-sm font-extrabold text-text-main">{{ skill_distribution.domain|default(0)
+                            }}%</span>
                     </div>
                     <div class="w-full bg-background border border-border-main rounded-full h-2.5 overflow-hidden">
-                        <div class="bg-primary-700 h-full rounded-full w-0 transition-all duration-1000 ease-out delay-200"
-                            style="width: 60%"></div>
+                        <div class="bg-primary-700 h-full rounded-full transition-all duration-1000 ease-out delay-200"
+                            style="width: {{ skill_distribution.domain|default(0) }}%"></div>
                     </div>
                 </div>
 

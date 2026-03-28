@@ -2,69 +2,190 @@
 {% block title %} – My Profile{% endblock %}
 
 {% block employee_content %}
-<h1>My Profile</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<table border="1" cellpadding="10">
-    <tr>
-        <td><strong>Username</strong></td>
-        <td>{{ user.username }}</td>
-    </tr>
-    <tr>
-        <td><strong>Email</strong></td>
-        <td>{{ user.email }}</td>
-    </tr>
-    <tr>
-        <td><strong>Role</strong></td>
-        <td>{{ user.role }}</td>
-    </tr>
-    <tr>
-        <td><strong>Department</strong></td>
-        <td>{{ user.department.name if user.department else 'Not assigned' }}</td>
-    </tr>
-    <tr>
-        <td><strong>Job Title</strong></td>
-        <td>{{ user.job_title or 'Not set' }}</td>
-    </tr>
-    <tr>
-        <td><strong>Member Since</strong></td>
-        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
-    </tr>
-</table>
+        <header class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">My Profile</h1>
+                <p class="text-text-muted">Manage your personal information and career growth.</p>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="px-6 py-2 bg-primary-700 text-text-inverse rounded-xl font-bold hover:bg-primary-800 transition-all shadow-sm">
+                    Edit Profile
+                </button>
+            </div>
+        </header>
 
-<h2>My Skills ({{ skills|length }})</h2>
-{% if skills %}
-<ul>
-    {% for skill in skills[:5] %}
-    <li>{{ skill.skill_name }} - Level {{ skill.proficiency_level }}/5 {{ '(Verified)' if skill.is_verified else '' }}
-    </li>
-    {% endfor %}
-    {% if skills|length > 5 %}
-    <li><a href="{{ url_for('employee.my_skills') }}">...and {{ skills|length - 5 }} more</a></li>
-    {% endif %}
-</ul>
-{% else %}
-<p>No skills added. <a href="{{ url_for('employee.my_skills') }}">Add skills</a></p>
-{% endif %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-<h2>My Resume</h2>
-{% if resume %}
-<p>
-    <strong>File:</strong> {{ resume.original_filename or 'Resume' }}<br>
-    <strong>Updated:</strong> {{ resume.last_updated.strftime('%Y-%m-%d %H:%M') if resume.last_updated else '-' }}
-</p>
-<p><a href="{{ url_for('employee.view_resume') }}">Manage resume</a></p>
-{% else %}
-<p>No resume uploaded. <a href="{{ url_for('employee.upload_resume') }}">Upload resume</a></p>
-{% endif %}
+            <div class="lg:col-span-1 space-y-6">
+                <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                    <div class="p-8 text-center border-b border-border-main bg-primary-50/30">
+                        <div
+                            class="w-24 h-24 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-3xl font-black mx-auto mb-4 border-4 border-surface shadow-sm">
+                            <div class="w-full h-full rounded-full bg-cover bg-center bg-border-main"
+                                style="background-image: url('https://api.dicebear.com/9.x/identicon/svg?seed={{ current_user.username }}')">
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-black text-text-main">{{ user.username }}</h2>
+                        <p class="text-primary-700 font-bold text-sm uppercase tracking-wider">{{ user.job_title or
+                            'Professional' }}</p>
+                    </div>
 
-<h2>Active Learning Path</h2>
-{% if active_path %}
-<p>
-    <strong>Target Role:</strong> {{ active_path.target_role }}<br>
-    <strong>Status:</strong> {{ active_path.status }}<br>
-    <a href="{{ url_for('employee.view_learning_path', path_id=active_path.id) }}">View Details</a>
-</p>
-{% else %}
-<p>No active learning path. <a href="{{ url_for('employee.learning_paths') }}">Generate one</a></p>
-{% endif %}
+                    <div class="p-6 space-y-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-text-light uppercase">Email Address</span>
+                            <span class="text-text-main font-medium">{{ user.email }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-text-light uppercase">Department</span>
+                            <span class="text-text-main font-medium">{{ user.department.name if user.department else
+                                'Not assigned' }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-text-light uppercase">System Role</span>
+                            <span class="text-text-main font-medium capitalize">{{ user.role }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-text-light uppercase">Member Since</span>
+                            <span class="text-text-main font-medium">{{ user.created_at.strftime('%B %d, %Y') }}</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+
+                <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                    <div class="px-8 py-5 border-b border-border-main flex items-center justify-between bg-white">
+                        <h3 class="text-xl font-bold text-text-main flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-600">psychology</span>
+                            Top Skills ({{ skills|length }})
+                        </h3>
+                        <a href="{{ url_for('employee.my_skills') }}"
+                            class="text-sm font-bold text-primary-700 hover:underline">Manage All</a>
+                    </div>
+
+                    <div class="p-8">
+                        {% if skills %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for skill in skills[:6] %}
+                            <div
+                                class="flex items-center justify-between p-4 bg-background rounded-xl border border-border-main group hover:border-primary-300 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+                                    <span class="font-bold text-text-main">{{ skill.skill_name }}</span>
+                                    {% if skill.is_verified %}
+                                    <span class="material-symbols-outlined text-primary-600 text-sm"
+                                        title="Verified">verified</span>
+                                    {% endif %}
+                                </div>
+                                <span
+                                    class="text-xs font-black bg-surface px-2 py-1 rounded border border-border-main text-text-muted">
+                                    Lvl {{ skill.proficiency_level }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if skills|length > 6 %}
+                        <p class="mt-6 text-center text-sm text-text-muted">
+                            And {{ skills|length - 6 }} other skills in your catalog.
+                        </p>
+                        {% endif %}
+                        {% else %}
+                        <div class="text-center py-8">
+                            <p class="text-text-muted mb-4">No skills added to your profile yet.</p>
+                            <a href="{{ url_for('employee.my_skills') }}"
+                                class="px-4 py-2 bg-primary-100 text-primary-700 rounded-lg text-sm font-bold hover:bg-primary-200 transition-all">Add
+                                My First Skill</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                    <div class="px-8 py-5 border-b border-border-main bg-white">
+                        <h3 class="text-xl font-bold text-text-main flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-600">description</span>
+                            My Resume
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        {% if resume %}
+                        <div class="bg-background rounded-xl border border-border-main p-6 space-y-4">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-text-light uppercase">File Name</span>
+                                <span class="text-text-main font-medium">{{ resume.original_filename or 'Resume' }}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-text-light uppercase">Last Updated</span>
+                                <span class="text-text-main font-medium">{{ resume.last_updated.strftime('%B %d, %Y') if resume.last_updated else '-' }}</span>
+                            </div>
+                            <div class="flex gap-3 pt-4">
+                                <a href="{{ url_for('employee.view_resume') }}"
+                                    class="px-4 py-2 bg-primary-100 text-primary-700 rounded-lg text-sm font-bold hover:bg-primary-200 transition-all">View Resume</a>
+                                <a href="{{ url_for('employee.upload_resume') }}"
+                                    class="px-4 py-2 bg-background text-text-main border border-border-main rounded-lg text-sm font-bold hover:bg-border-main transition-all">Upload New</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="border-2 border-dashed border-border-main rounded-2xl p-12 text-center">
+                            <span class="material-symbols-outlined text-text-light text-5xl mb-4">upload_file</span>
+                            <h4 class="text-text-main font-bold text-lg">No resume uploaded yet</h4>
+                            <p class="text-text-muted text-sm mb-6">Upload your resume to help managers and the AI understand your background.</p>
+                            <a href="{{ url_for('employee.upload_resume') }}"
+                                class="px-6 py-3 bg-primary-700 text-text-inverse rounded-xl font-bold hover:bg-primary-800 transition-all">Upload Resume</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+
+                <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden">
+                    <div class="px-8 py-5 border-b border-border-main bg-white">
+                        <h3 class="text-xl font-bold text-text-main flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-600">moving</span>
+                            Active Learning Path
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        {% if active_path %}
+                        <div class="bg-primary-700 p-6 rounded-2xl relative overflow-hidden group">
+                            <div class="relative z-10 text-text-inverse">
+                                <span class="text-xs font-black uppercase tracking-widest text-text-inverse/70">Current
+                                    Goal</span>
+                                <h4 class="text-2xl font-black mt-1 mb-2">{{ active_path.target_role }}</h4>
+                                <div class="flex items-center gap-4 mb-6">
+                                    <span class="px-3 py-1 bg-white/20 rounded-full text-xs font-bold capitalize">{{
+                                        active_path.status }}</span>
+                                    <span class="text-xs text-text-inverse/80">Started in {{
+                                        active_path.created_at.strftime('%b %Y') if active_path.created_at else 'Recent'
+                                        }}</span>
+                                </div>
+                                <a href="{{ url_for('employee.view_learning_path', path_id=active_path.id) }}"
+                                    class="inline-block px-6 py-2 bg-surface text-primary-700 rounded-xl text-sm font-black hover:bg-primary-50 transition-all">
+                                    Continue Learning
+                                </a>
+                            </div>
+                            <span
+                                class="material-symbols-outlined absolute -bottom-6 -right-6 text-[8rem] text-text-inverse/10 opacity-50 group-hover:scale-110 transition-transform duration-500">auto_awesome</span>
+                        </div>
+                        {% else %}
+                        <div class="border-2 border-dashed border-border-main rounded-2xl p-12 text-center">
+                            <span class="material-symbols-outlined text-text-light text-5xl mb-4">route</span>
+                            <h4 class="text-text-main font-bold text-lg">No active path found</h4>
+                            <p class="text-text-muted text-sm mb-6">Generate an AI-powered learning path to reach your
+                                next career milestone.</p>
+                            <a href="{{ url_for('employee.learning_paths') }}"
+                                class="px-6 py-3 bg-primary-700 text-text-inverse rounded-xl font-bold hover:bg-primary-800 transition-all">Generate
+                                Path</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

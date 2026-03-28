@@ -2,7 +2,7 @@
 {% block title %} – Team for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+<div class="flex flex-col gap-8 px-6 pb-12 max-w-7xl mx-auto">
     <div class="w-full space-y-8">
 
         <nav class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -13,18 +13,18 @@
                 Back to Project: {{ project.title }}
             </a>
             <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
-                class="px-6 py-2 bg-primary-700 text-text-inverse rounded-xl font-black hover:bg-primary-800 transition-all shadow-md flex items-center gap-2">
+                class="px-6 py-2 bg-primary-700 text-text-inverse rounded-xl font-extrabold hover:bg-primary-800 transition-all shadow-md flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">person_add</span>
                 Add More Members
             </a>
         </nav>
 
         <header>
-            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Project Team Roster</h1>
+            <h1 class="text-3xl font-extrabold text-text-main tracking-wide">Project Team Roster</h1>
             <p class="text-text-muted">Manage the active contributors and their roles within this initiative.</p>
         </header>
 
-        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+        <section class="bg-surface rounded-xl shadow-sm border border-border-main overflow-hidden">
             <div class="bg-surface px-8 py-5 border-b border-border-main">
                 <h2 class="text-xl font-bold text-text-main">Active Members ({{ team|length }})</h2>
             </div>
@@ -49,7 +49,7 @@
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-4">
                                     <div
-                                        class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-black text-xs border border-primary-200">
+                                        class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-extrabold text-xs border border-primary-200">
                                         {{ member.username[:2] | upper }}
                                     </div>
                                     <div class="flex flex-col">
@@ -63,7 +63,7 @@
                             </td>
                             <td class="px-8 py-6">
                                 <span
-                                    class="px-3 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    class="px-3 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-extrabold uppercase tracking-widest">
                                     {{ member.role_in_project or 'Contributor' }}
                                 </span>
                             </td>
@@ -105,7 +105,7 @@
                                     <p class="text-sm max-w-xs mx-auto mb-4">Start building your team by matching
                                         employees based on project requirements.</p>
                                     <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
-                                        class="text-primary-700 font-black hover:underline underline-offset-4">
+                                        class="text-primary-700 font-extrabold hover:underline underline-offset-4">
                                         Find matching employees &rarr;
                                     </a>
                                 </div>

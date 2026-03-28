@@ -506,3 +506,256 @@ class TestAdminNotifications:
 
         response = authenticated_admin_client.get("/admin/")
         assert response.status_code == 200
+
+
+class TestSkillCatalogManagement:
+    """Test suite for Global Skill Catalog Management."""
+
+    def test_list_skills_loads(self, authenticated_admin_client, skills):
+        """Test that skill catalog page loads successfully."""
+        response = authenticated_admin_client.get("/admin/skills")
+        assert response.status_code == 200
+        assert b"Skill Catalog" in response.data or b"Skills" in response.data
+
+    def test_list_skills_shows_skills(self, authenticated_admin_client, skills):
+        """Test that skills are displayed in the catalog."""
+        response = authenticated_admin_client.get("/admin/skills")
+        assert response.status_code == 200
+        assert skills[0].name.encode() in response.data
+
+    def test_list_skills_filter_by_category(self, authenticated_admin_client, skills):
+        """Test filtering skills by category."""
+        response = authenticated_admin_client.get("/admin/skills?category=technical")
+        assert response.status_code == 200
+        assert b"Python" in response.data
+
+    def test_list_skills_search(self, authenticated_admin_client, skills):
+        """Test searching skills by name."""
+        response = authenticated_admin_client.get("/admin/skills?q=Python")
+        assert response.status_code == 200
+        assert b"Python" in response.data
+
+    def test_add_skill_form_loads(self, authenticated_admin_client):
+        """Test that add skill form loads successfully."""
+        response = authenticated_admin_client.get("/admin/skills/add")
+        assert response.status_code == 200
+        assert b"Add" in response.data
+
+    def test_add_skill_success(self, authenticated_admin_client, db_session):
+        """Test adding a new skill successfully."""
+        response = authenticated_admin_client.post(
+            "/admin/skills/add",
+            data={"name": "Kubernetes", "category": "technical"},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+
+        from app.models import Skill
+        skill = Skill.query.filter_by(name="Kubernetes").first()
+        assert skill is not None
+        assert skill.category == "technical"
+
+    def test_add_skill_empty_name(self, authenticated_admin_client):
+        """Test adding skill with empty name fails."""
+        response = authenticated_admin_client.post(
+            "/admin/skills/add",
+            data={"name": "", "category": "technical"},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"required" in response.data.lower() or b"danger" in response.data.lower()
+
+    def test_add_skill_duplicate_name(self, authenticated_admin_client, skills):
+        """Test adding skill with duplicate name fails."""
+        response = authenticated_admin_client.post(
+            "/admin/skills/add",
+            data={"name": "Python", "category": "technical"},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"already exists" in response.data.lower()
+
+    def test_edit_skill_form_loads(self, authenticated_admin_client, skills):
+        """Test that edit skill form loads successfully."""
+        response = authenticated_admin_client.get(f"/admin/skills/{skills[0].id}/edit")
+        assert response.status_code == 200
+        assert skills[0].name.encode() in response.data
+
+    def test_edit_skill_nonexistent(self, authenticated_admin_client):
+        """Test editing non-existent skill returns 404."""
+        response = authenticated_admin_client.get("/admin/skills/99999/edit")
+        assert response.status_code == 404
+
+    def test_edit_skill_success(self, authenticated_admin_client, db_session, skills):
+        """Test editing a skill successfully."""
+        skill_id = skills[0].id
+        response = authenticated_admin_client.post(
+            f"/admin/skills/{skill_id}/edit",
+            data={"name": "Python 3", "category": "technical"},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+
+        from app.models import Skill
+        db_session.expire_all()
+        skill = db_session.get(Skill, skill_id)
+        assert skill.name == "Python 3"
+
+    def test_edit_skill_duplicate_name(self, authenticated_admin_client, skills):
+        """Test editing skill to duplicate name fails."""
+        response = authenticated_admin_client.post(
+            f"/admin/skills/{skills[0].id}/edit",
+            data={"name": "JavaScript", "category": "technical"},
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+        assert b"already exists" in response.data.lower()
+
+    def test_delete_skill_success(self, authenticated_admin_client, db_session):
+        """Test deleting a skill successfully."""
+        from app.models import Skill
+        skill = Skill(name="ToDelete", category="technical")
+        db_session.add(skill)
+        db_session.commit()
+        skill_id = skill.id
+
+        response = authenticated_admin_client.post(
+            f"/admin/skills/{skill_id}/delete",
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+
+        deleted_skill = db_session.get(Skill, skill_id)
+        assert deleted_skill is None
+
+    def test_delete_skill_nonexistent(self, authenticated_admin_client):
+        """Test deleting non-existent skill returns 404."""
+        response = authenticated_admin_client.post("/admin/skills/99999/delete")
+        assert response.status_code == 404
+
+    def test_non_admin_cannot_access_skills(self, authenticated_employee_client):
+        """Test that non-admin users cannot access skill catalog."""
+        response = authenticated_employee_client.get("/admin/skills")
+        assert response.status_code == 403
+
+    def test_non_admin_cannot_add_skill(self, authenticated_employee_client):
+        """Test that non-admin users cannot add skills."""
+        response = authenticated_employee_client.post(
+            "/admin/skills/add",
+            data={"name": "NewSkill", "category": "technical"}
+        )
+        assert response.status_code == 403
+
+    def test_non_admin_cannot_delete_skill(self, authenticated_manager_client, skills):
+        """Test that non-admin users cannot delete skills."""
+        response = authenticated_manager_client.post(f"/admin/skills/{skills[0].id}/delete")
+        assert response.status_code == 403
+
+
+class TestProjectOversight:
+    """Test suite for System-Wide Project Oversight."""
+
+    def test_list_projects_loads(self, authenticated_admin_client, project):
+        """Test that project oversight page loads successfully."""
+        response = authenticated_admin_client.get("/admin/projects")
+        assert response.status_code == 200
+        assert b"Project" in response.data
+
+    def test_list_projects_shows_all_projects(self, authenticated_admin_client, project):
+        """Test that all projects are displayed."""
+        response = authenticated_admin_client.get("/admin/projects")
+        assert response.status_code == 200
+        assert project.title.encode() in response.data
+
+    def test_list_projects_filter_by_status(self, authenticated_admin_client, project):
+        """Test filtering projects by status."""
+        response = authenticated_admin_client.get("/admin/projects?status=active")
+        assert response.status_code == 200
+        assert project.title.encode() in response.data
+
+    def test_list_projects_search(self, authenticated_admin_client, project):
+        """Test searching projects by title."""
+        response = authenticated_admin_client.get(f"/admin/projects?q={project.title[:4]}")
+        assert response.status_code == 200
+        assert project.title.encode() in response.data
+
+    def test_view_project_detail(self, authenticated_admin_client, project):
+        """Test viewing project details."""
+        response = authenticated_admin_client.get(f"/admin/projects/{project.id}")
+        assert response.status_code == 200
+        assert project.title.encode() in response.data
+
+    def test_view_project_with_skills(self, authenticated_admin_client, project_with_skills):
+        """Test viewing project with skill requirements."""
+        response = authenticated_admin_client.get(f"/admin/projects/{project_with_skills.id}")
+        assert response.status_code == 200
+        assert b"Python" in response.data
+
+    def test_view_project_nonexistent(self, authenticated_admin_client):
+        """Test viewing non-existent project returns 404."""
+        response = authenticated_admin_client.get("/admin/projects/99999")
+        assert response.status_code == 404
+
+    def test_force_delete_project_success(self, authenticated_admin_client, db_session, manager_user):
+        """Test force-deleting a project successfully."""
+        from app.models import Project
+        proj = Project(
+            title="ToDelete Project",
+            description="Will be deleted",
+            status="active",
+            manager_id=manager_user.id,
+        )
+        db_session.add(proj)
+        db_session.commit()
+        project_id = proj.id
+
+        response = authenticated_admin_client.post(
+            f"/admin/projects/{project_id}/delete",
+            follow_redirects=True
+        )
+        assert response.status_code == 200
+
+        deleted_project = db_session.get(Project, project_id)
+        assert deleted_project is None
+
+    def test_force_delete_project_nonexistent(self, authenticated_admin_client):
+        """Test force-deleting non-existent project returns 404."""
+        response = authenticated_admin_client.post("/admin/projects/99999/delete")
+        assert response.status_code == 404
+
+    def test_non_admin_cannot_access_projects(self, authenticated_employee_client):
+        """Test that non-admin users cannot access project oversight."""
+        response = authenticated_employee_client.get("/admin/projects")
+        assert response.status_code == 403
+
+    def test_non_admin_cannot_view_project(self, authenticated_manager_client, project):
+        """Test that non-admin users cannot view project details via admin route."""
+        response = authenticated_manager_client.get(f"/admin/projects/{project.id}")
+        assert response.status_code == 403
+
+    def test_non_admin_cannot_delete_project(self, authenticated_manager_client, project):
+        """Test that non-admin users cannot force-delete projects."""
+        response = authenticated_manager_client.post(f"/admin/projects/{project.id}/delete")
+        assert response.status_code == 403
+
+
+class TestNLPStats:
+    """Test suite for NLP Statistics page."""
+
+    def test_nlp_stats_loads(self, authenticated_admin_client):
+        """Test that NLP stats page loads successfully."""
+        response = authenticated_admin_client.get("/admin/nlp-stats")
+        assert response.status_code == 200
+        assert b"NLP" in response.data or b"Pipeline" in response.data
+
+    def test_nlp_stats_shows_statistics(self, authenticated_admin_client):
+        """Test that NLP statistics are displayed."""
+        response = authenticated_admin_client.get("/admin/nlp-stats")
+        assert response.status_code == 200
+        # Check for stat categories
+        assert b"Total" in response.data or b"Success" in response.data
+
+    def test_non_admin_cannot_access_nlp_stats(self, authenticated_employee_client):
+        """Test that non-admin users cannot access NLP stats."""
+        response = authenticated_employee_client.get("/admin/nlp-stats")
+        assert response.status_code == 403

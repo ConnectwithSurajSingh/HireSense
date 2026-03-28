@@ -1,0 +1,86 @@
+{% extends "admin/admin_base.html" %}
+{% block title %} – {{ 'Edit Skill' if skill else 'Add Skill' }}{% endblock %}
+
+{% block admin_content %}
+<div class="px-6 pb-6">
+    <div class="max-w-2xl mx-auto space-y-6">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm">
+            <a href="{{ url_for('admin.list_skills') }}"
+                class="text-text-muted hover:text-primary-600 transition-colors">
+                Skills
+            </a>
+            <span class="text-text-light">/</span>
+            <span class="text-text-main font-medium">{{ 'Edit Skill' if skill else 'Add Skill' }}</span>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-surface rounded-xl border border-border-main shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-border-main bg-gray-50">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-primary-100 text-primary-700 rounded-xl">
+                        <span class="material-symbols-outlined">{{ 'edit' if skill else 'add' }}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-text-main">{{ 'Edit Skill' if skill else 'Add New Skill' }}
+                        </h2>
+                        <p class="text-sm text-text-muted">{{ 'Update skill details' if skill else 'Add a new skill to
+                            the catalog' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" class="p-6 space-y-6">
+                <!-- Skill Name -->
+                <div class="space-y-2">
+                    <label for="name" class="block text-sm font-medium text-text-main">
+                        Skill Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" required value="{{ skill.name if skill else '' }}"
+                        class="w-full px-4 py-2.5 bg-background border border-border-main rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all"
+                        placeholder="e.g., Python, Project Management, Financial Analysis" />
+                    <p class="text-xs text-text-muted">Enter a unique name for this skill.</p>
+                </div>
+
+                <!-- Category -->
+                <div class="space-y-2">
+                    <label for="category" class="block text-sm font-medium text-text-main">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <select id="category" name="category" required
+                        class="w-full px-4 py-2.5 bg-background border border-border-main rounded-lg text-sm focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all cursor-pointer">
+                        <option value="technical" {% if skill and skill.category=='technical' %}selected{% elif not
+                            skill %}selected{% endif %}>
+                            Technical
+                        </option>
+                        <option value="soft" {% if skill and skill.category=='soft' %}selected{% endif %}>
+                            Soft Skills
+                        </option>
+                        <option value="domain" {% if skill and skill.category=='domain' %}selected{% endif %}>
+                            Domain Knowledge
+                        </option>
+                    </select>
+                    <p class="text-xs text-text-muted">
+                        <strong>Technical:</strong> Programming languages, tools, frameworks<br>
+                        <strong>Soft Skills:</strong> Communication, leadership, teamwork<br>
+                        <strong>Domain:</strong> Industry-specific knowledge
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-border-main">
+                    <a href="{{ url_for('admin.list_skills') }}"
+                        class="px-4 py-2 text-sm font-medium text-text-main bg-background border border-border-main rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-all hover:-translate-y-0.5 hover:shadow-md">
+                        <span class="material-symbols-outlined text-[16px]">{{ 'save' if skill else 'add' }}</span>
+                        {{ 'Save Changes' if skill else 'Add Skill' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

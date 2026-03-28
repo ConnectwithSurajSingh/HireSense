@@ -83,11 +83,13 @@
     <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
         <!-- Top Navbar -->
         <header
-            class="px-6 py-4 bg-surface border-b border-border-main flex justify-between items-center z-10 shrink-0 shadow-sm relative mb-6">
+            class="px-6 py-4 bg-surface border-b border-border-main flex justify-between items-center z-10 shrink-0 shadow-sm relative">
             <div class="flex items-center gap-2 text-sm">
                 <span class="text-text-muted font-medium">Manager</span>
                 <span class="text-text-light font-bold">&gt;</span>
+                {% block breadcrumb %}
                 <span class="font-bold text-text-main">{{ active_page }}</span>
+                {% endblock %}
             </div>
 
             <div class="flex items-center space-x-2">
@@ -98,10 +100,9 @@
                         <summary
                             class="relative p-2 text-text-muted hover:text-text-muted hover:bg-background rounded-lg transition-all duration-200 cursor-pointer list-none appearance-none [&::-webkit-details-marker]:hidden hover:scale-105 active:scale-95">
                             <span class="material-symbols-outlined">notifications</span>
-                            {% if manager_unread_count and manager_unread_count > 0 %}
+                            <!-- Static notification badge -->
                             <span
                                 class="absolute top-2 right-2 size-2 bg-blue-600 rounded-full border-2 border-surface"></span>
-                            {% endif %}
                         </summary>
 
                         <div
@@ -109,44 +110,28 @@
                             <div
                                 class="p-4 border-b border-border-main flex justify-between items-center bg-background/50">
                                 <h4 class="font-bold text-sm text-text-main">Notifications</h4>
-                                {% if manager_unread_count and manager_unread_count > 0 %}
-                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">
-                                    {{ manager_unread_count }} NEW
-                                </span>
-                                {% endif %}
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">3
+                                    NEW</span>
                             </div>
 
                             <div class="max-h-80 overflow-y-auto divide-y divide-background scrollbar-thin">
-                                {% if manager_notifications %}
-                                {% for notif in manager_notifications %}
-                                <div class="p-4 hover:bg-background transition-colors">
-                                    <div class="flex justify-between items-start gap-2">
-                                        <p
-                                            class="text-xs font-bold {% if notif.type == 'danger' %}text-rose-700{% elif notif.type == 'success' %}text-primary-700{% else %}text-blue-700{% endif %} uppercase tracking-wide">
-                                            {{ notif.type }}
-                                        </p>
-                                        <span class="text-[10px] text-text-light whitespace-nowrap">{{
-                                            notif.created_at.strftime('%H:%M') }}</span>
-                                    </div>
-                                    <p class="text-xs text-text-muted mt-1.5 leading-relaxed">{{ notif.message }}</p>
-                                </div>
-                                {% endfor %}
-                                {% else %}
                                 <div class="p-6 text-center">
                                     <p class="text-xs text-text-muted">No new notifications.</p>
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
                     </details>
 
+                    <!-- Help Button -->
                     <button
                         class="p-2 text-text-muted hover:text-text-muted hover:bg-background rounded-lg transition-all duration-200 hover:scale-105 active:scale-95">
                         <span class="material-symbols-outlined">help</span>
                     </button>
 
+                    <!-- Divider -->
                     <div class="h-6 w-[1px] bg-border-main"></div>
 
+                    <!-- User Profile -->
                     <div class="flex items-center gap-3 cursor-pointer group">
                         <div class="text-right">
                             <p class="text-sm font-bold text-text-main group-hover:text-blue-600 transition-colors">{{
@@ -165,25 +150,32 @@
             </div>
         </header>
 
-        <!-- Scrollable Content Viewport -->
-        <div class="flex-1 overflow-y-auto pb-8">
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto py-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="px-8 mb-6 space-y-3">
+                {% for category, message in messages %}
+                <div class="flex items-start gap-3 p-4 rounded-lg border shadow-sm
+                    {% if category == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-900
+                    {% elif category == 'danger' %}bg-rose-50 border-rose-200 text-rose-900
+                    {% else %}bg-blue-50 border-blue-200 text-blue-900{% endif %}">
+                    <span class="material-symbols-outlined text-lg flex-shrink-0 mt-0.5
+                        {% if category == 'success' %}text-emerald-600
+                        {% elif category == 'danger' %}text-rose-600
+                        {% else %}text-blue-600{% endif %}">
+                        {% if category == 'success' %}check_circle
+                        {% elif category == 'danger' %}error
+                        {% else %}info{% endif %}
+                    </span>
+                    <p class="text-sm font-medium flex-1">{{ message }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
             {% block manager_content %}{% endblock %}
         </div>
     </main>
 </div>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-<div style="margin-bottom: 15px;">
-    {% for category, message in messages %}
-    <div style="padding: 10px; margin-bottom: 5px; border: 1px solid;
-        {% if category == 'success' %}background-color: #d4edda; border-color: #28a745;
-        {% elif category == 'danger' %}background-color: #f8d7da; border-color: #dc3545;
-        {% else %}background-color: #d1ecf1; border-color: #17a2b8;{% endif %}">
-        {{ message }}
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
 {% endblock %}

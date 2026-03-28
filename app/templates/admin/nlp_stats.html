@@ -1,0 +1,188 @@
+{% extends "admin/admin_base.html" %}
+{% block title %} – NLP Pipeline Stats{% endblock %}
+
+{% block admin_content %}
+<div class="px-6 pb-6">
+    <div class="flex-1 space-y-6 overflow-y-auto">
+        <!-- Statistical Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-primary-100 text-primary-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">description</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Total</p>
+                    <p class="text-xl font-bold text-text-main">{{ stats.total }}</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-green-100 text-green-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">check_circle</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Success</p>
+                    <p class="text-xl font-bold text-green-700">{{ stats.success }}</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-amber-100 text-amber-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">warning</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Degraded</p>
+                    <p class="text-xl font-bold text-amber-700">{{ stats.degraded }}</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-red-100 text-red-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">error</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Failed</p>
+                    <p class="text-xl font-bold text-red-700">{{ stats.failed }}</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-slate-100 text-slate-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">hourglass_empty</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Pending</p>
+                    <p class="text-xl font-bold text-slate-700">{{ stats.not_parsed }}</p>
+                </div>
+            </div>
+            <div
+                class="flex items-center gap-4 bg-surface p-5 rounded-xl border border-border-main shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-2 bg-blue-100 text-blue-700 rounded-xl pb-1">
+                    <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wider">Avg Skills</p>
+                    <p class="text-xl font-bold text-blue-700">{{ stats.avg_skills }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Rate Progress -->
+        <div class="bg-surface p-6 rounded-xl border border-border-main shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-semibold text-text-main">NLP Parse Success Rate</h3>
+                    <p class="text-sm text-text-muted">Overall health of resume parsing pipeline</p>
+                </div>
+                <form action="{{ url_for('admin.reparse_all_resumes') }}" method="POST"
+                    onsubmit="return confirm('This will re-parse all resumes in the system. This operation may take a while. Continue?');">
+                    <button type="submit"
+                        class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">refresh</span>
+                        Re-parse All
+                    </button>
+                </form>
+            </div>
+            {% set success_rate = (stats.success / stats.total * 100) if stats.total > 0 else 0 %}
+            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div class="h-4 rounded-full transition-all duration-500
+                    {% if success_rate >= 80 %}bg-green-500
+                    {% elif success_rate >= 50 %}bg-amber-500
+                    {% else %}bg-red-500{% endif %}" style="width: {{ success_rate }}%">
+                </div>
+            </div>
+            <div class="flex justify-between mt-2 text-sm text-text-muted">
+                <span>{{ '%.1f'|format(success_rate) }}% Success Rate</span>
+                <span>{{ stats.success }} of {{ stats.total }} resumes</span>
+            </div>
+        </div>
+
+        <!-- Detail Table -->
+        <div class="bg-surface rounded-xl border border-border-main overflow-hidden shadow-sm">
+            <div class="p-4 border-b border-border-main bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600">table_chart</span>
+                        <h3 class="font-semibold text-text-main">Resume Details</h3>
+                    </div>
+                    <span class="text-sm text-text-muted">{{ detail_rows|length }} resumes</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                {% if detail_rows %}
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-border-main">
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Resume
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status
+                            </th>
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Skills
+                                Found</th>
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Last
+                                Updated</th>
+                            <th class="px-6 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Parsed
+                                At</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main">
+                        {% for row in detail_rows %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-cover bg-center border border-border-main"
+                                        style="background-image: url('https://api.dicebear.com/9.x/identicon/svg?seed={{ row.username }}')">
+                                    </div>
+                                    <span class="text-sm font-medium text-text-main">{{ row.username }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-3 text-sm text-text-muted">
+                                {{ row.original_filename[:30] }}{% if row.original_filename|length > 30 %}...{% endif %}
+                            </td>
+                            <td class="px-6 py-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if row.nlp_status == 'success' %}bg-green-50 text-green-700
+                                    {% elif 'degraded' in row.nlp_status %}bg-amber-50 text-amber-700
+                                    {% elif row.nlp_status == 'not_parsed' %}bg-slate-50 text-slate-700
+                                    {% else %}bg-red-50 text-red-700{% endif %}">
+                                    {{ row.nlp_status|replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-3">
+                                {% if row.skill_count > 0 %}
+                                <span class="text-sm font-medium text-text-main">{{ row.skill_count }}</span>
+                                {% else %}
+                                <span class="text-sm text-text-muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-3 text-sm text-text-muted">
+                                {% if row.last_updated %}
+                                {{ row.last_updated.strftime('%b %d, %Y %H:%M') }}
+                                {% else %}
+                                —
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-3 text-sm text-text-muted">
+                                {{ row.parsed_at if row.parsed_at else '—' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="p-12 text-center">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-3xl text-text-light">description</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-text-main mb-1">No resumes found</h3>
+                    <p class="text-sm text-text-muted">No resumes have been uploaded to the system yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
