@@ -2,48 +2,125 @@
 {% block title %} – Team for {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<h1>Project Team: {{ project.title }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p>
-    <a href="{{ url_for('manager.view_project', project_id=project.id) }}">&larr; Back to Project</a> |
-    <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Add More Members</a>
-</p>
+        <nav class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <a href="{{ url_for('manager.view_project', project_id=project.id) }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Project: {{ project.title }}
+            </a>
+            <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
+                class="px-6 py-2 bg-primary-700 text-text-inverse rounded-xl font-black hover:bg-primary-800 transition-all shadow-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">person_add</span>
+                Add More Members
+            </a>
+        </nav>
 
-<h2>Team Members ({{ team|length }})</h2>
-{% if team %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Department</th>
-        <th>Job Title</th>
-        <th>Role in Project</th>
-        <th>Assigned Date</th>
-        <th>Actions</th>
-    </tr>
-    {% for member in team %}
-    <tr>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}">{{ member.username }}</a>
-        </td>
-        <td>{{ member.email }}</td>
-        <td>{{ member.department or '-' }}</td>
-        <td>{{ member.job_title or '-' }}</td>
-        <td>{{ member.role_in_project or '-' }}</td>
-        <td>{{ member.allotted_date.strftime('%Y-%m-%d') if member.allotted_date else '-' }}</td>
-        <td>
-            <a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}">Skills</a> |
-            <form method="POST"
-                action="{{ url_for('manager.unassign_employee', project_id=project.id, user_id=member.user_id) }}"
-                style="display: inline;">
-                <button type="submit"
-                    onclick="return confirm('Remove this employee from the project?');">Remove</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No team members assigned yet. <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Find matching
-        employees</a></p>
-{% endif %}
+        <header>
+            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Project Team Roster</h1>
+            <p class="text-text-muted">Manage the active contributors and their roles within this initiative.</p>
+        </header>
+
+        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+            <div class="bg-surface px-8 py-5 border-b border-border-main">
+                <h2 class="text-xl font-bold text-text-main">Active Members ({{ team|length }})</h2>
+            </div>
+
+            <div class="overflow-x-auto overflow-y-auto max-h-150 relative">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead>
+                        <tr>
+                            {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main px-8 py-4
+                            text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                            <th class="{{ th_classes }}">Member Details</th>
+                            <th class="{{ th_classes }}">Project Role</th>
+                            <th class="{{ th_classes }}">Department</th>
+                            <th class="{{ th_classes }}">Assigned Date</th>
+                            <th class="{{ th_classes }} text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main">
+                        {% if team %}
+                        {% for member in team %}
+                        <tr class="group hover:bg-background transition-colors duration-150">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-black text-xs border border-primary-200">
+                                        {{ member.username[:2] | upper }}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}"
+                                            class="font-bold text-text-main hover:text-primary-700 transition-colors">
+                                            {{ member.username }}
+                                        </a>
+                                        <span class="text-xs text-text-muted">{{ member.email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span
+                                    class="px-3 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    {{ member.role_in_project or 'Contributor' }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-text-main">{{ member.department or '-' }}</p>
+                                <p class="text-[10px] text-text-muted font-medium uppercase">{{ member.job_title or
+                                    'Staff' }}</p>
+                            </td>
+                            <td class="px-8 py-6 text-sm text-text-muted font-medium">
+                                {{ member.allotted_date.strftime('%b %d, %Y') if member.allotted_date else '-' }}
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex justify-end items-center gap-2">
+                                    <a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}"
+                                        class="p-2 text-text-light hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-all"
+                                        title="View Skills">
+                                        <span class="material-symbols-outlined text-sm">psychology</span>
+                                    </a>
+                                    <form method="POST"
+                                        action="{{ url_for('manager.unassign_employee', project_id=project.id, user_id=member.user_id) }}"
+                                        class="inline">
+                                        <button type="submit"
+                                            onclick="return confirm('Are you sure you want to remove this employee from the project team?');"
+                                            class="p-2 text-text-light hover:text-danger-800 hover:bg-danger-50 rounded-lg transition-all"
+                                            title="Remove Member">
+                                            <span class="material-symbols-outlined text-sm">person_remove</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-20 text-center text-text-muted bg-surface">
+                                <div class="flex flex-col items-center gap-3">
+                                    <span class="material-symbols-outlined text-5xl text-text-light">groups_3</span>
+                                    <p class="font-medium text-lg text-text-main">No team members assigned yet.</p>
+                                    <p class="text-sm max-w-xs mx-auto mb-4">Start building your team by matching
+                                        employees based on project requirements.</p>
+                                    <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
+                                        class="text-primary-700 font-black hover:underline underline-offset-4">
+                                        Find matching employees &rarr;
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="px-8 py-4 bg-background border-t border-border-main">
+                <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Team assignments are based on
+                    current resource availability.</p>
+            </footer>
+        </section>
+    </div>
+</div>
 {% endblock %}

@@ -51,6 +51,7 @@ def dashboard():
         stats=stats,
         projects=projects,
         recent_updates=recent_updates,
+        active_page="Dashboard"
     )
 
 
@@ -72,6 +73,7 @@ def list_projects():
         "manager/projects.html",
         projects=projects,
         status_filter=status_filter,
+        active_page="Projects"
     )
 
 
@@ -381,6 +383,7 @@ def view_updates():
         "manager/updates.html",
         skill_updates=skill_updates,
         resume_updates=resume_updates,
+        active_page="Updates"
     )
 
 
@@ -439,6 +442,7 @@ def profile():
         user=current_user,
         skills=skills,
         active_path=active_path,
+        active_page="My Profile"
     )
 
 
@@ -457,6 +461,7 @@ def my_skills():
         "manager/skills.html",
         skills=skills,
         available_skills=available_skills,
+        active_page="My Skills"
     )
 
 
@@ -525,6 +530,7 @@ def learning_paths():
         "manager/learning_paths.html",
         paths=paths,
         available_roles=available_roles,
+        active_page="Learning Paths"
     )
 
 
@@ -585,4 +591,5 @@ def compare_roles():
         available_roles=available_roles,
         selected_role=target_role,
         comparison=comparison,
+        active_page="Compare Roles"
     )

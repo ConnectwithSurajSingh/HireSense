@@ -287,3 +287,112 @@ def seed_data(full: bool):
             click.echo(click.style(f"Project assignments: {ProjectAssignment.query.count()} total", fg="green"))
 
     click.echo(click.style("\nSeed data complete!", fg="green"))
+
+# To seed data to a specific manager
+# Usage:
+# flask seed_manager_data 81
+@click.command("seed-manager-data")
+@click.argument("manager_id", type=int)
+@with_appcontext
+def seed_manager_data(manager_id: int):
+    """
+    Seed specific projects, skills, and approved employees for a single manager.
+    
+    MANAGER_ID: The ID of the user (must have role='manager')
+    """
+    from faker import Faker
+    from app import db
+    from app.models import User, Project, Department, Skill, ProjectSkill, ProjectAssignment, UserSkill
+    
+    fake = Faker()
+    
+    # 1. Validate Manager
+    manager = db.session.get(User, manager_id)
+    if not manager or manager.role != "manager":
+        click.echo(click.style(f"Error: User with ID {manager_id} not found or is not a manager.", fg="red"))
+        return
+
+    click.echo(f"Seeding data for Manager: {click.style(manager.username, bold=True)}")
+
+    # 2. Ensure basic globals exist (Departments/Skills)
+    all_depts = Department.query.all()
+    if not all_depts:
+        click.echo("No departments found. Please run 'flask seed-data' first.")
+        return
+    
+    all_skills = Skill.query.all()
+    if not all_skills:
+        click.echo("No skills found. Please run 'flask seed-data' first.")
+        return
+
+    # 3. Update Manager Profile
+    manager.department_id = random.choice([d.id for d in all_depts])
+    manager.job_title = "Senior Project Manager"
+    manager.is_approved = True
+    
+    # 4. Create Projects for this Manager
+    project_count = random.randint(2, 4)
+    for _ in range(project_count):
+        project = Project(
+            title=fake.catch_phrase(),
+            description=fake.paragraph(nb_sentences=3),
+            status=random.choice(["planning", "active"]),
+            manager_id=manager.id,
+            start_date=fake.date_between(start_date="-1y", end_date="today"),
+            end_date=fake.date_between(start_date="today", end_date="+1y")
+        )
+        db.session.add(project)
+        db.session.flush() # Get ID for relationships
+
+        # Add 3-5 random required skills to the project
+        sampled_skills = random.sample(all_skills, k=min(len(all_skills), random.randint(3, 5)))
+        for s in sampled_skills:
+            ps = ProjectSkill(
+                project_id=project.id,
+                skill_id=s.id,
+                is_mandatory=random.choice([True, False]),
+                minimum_proficiency=random.randint(2, 4)
+            )
+            db.session.add(ps)
+
+        # 5. Create and Assign Approved Employees to THIS Project
+        emp_count = random.randint(3, 5)
+        for _ in range(emp_count):
+            employee = User(
+                username=fake.user_name(),
+                email=fake.unique.email(),
+                role="employee",
+                is_active=True,
+                is_approved=True, # Required
+                department_id=manager.department_id,
+                job_title=fake.job()
+            )
+            employee.set_password("password123")
+            db.session.add(employee)
+            db.session.flush()
+
+            # Assign to project
+            assignment = ProjectAssignment(
+                project_id=project.id,
+                user_id=employee.id,
+                role_in_project=random.choice(["Developer", "Lead", "QA", "Analyst"]),
+                status="active"
+            )
+            db.session.add(assignment)
+
+            # Give employee random skills so the "Match" logic works later
+            for s in random.sample(all_skills, k=random.randint(2, 4)):
+                us = UserSkill(
+                    user_id=employee.id,
+                    skill_id=s.id,
+                    proficiency_level=random.randint(1, 5),
+                    is_verified=True
+                )
+                db.session.add(us)
+
+    try:
+        db.session.commit()
+        click.echo(click.style(f"Successfully seeded {project_count} projects for {manager.username}.", fg="green"))
+    except Exception as e:
+        db.session.rollback()
+        click.echo(click.style(f"Error committing data: {str(e)}", fg="red"))

@@ -2,93 +2,181 @@
 {% block title %} – {{ project.title }}{% endblock %}
 
 {% block manager_content %}
-<h1>{{ project.title }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p>
-    <a href="{{ url_for('manager.list_projects') }}">&larr; Back to Projects</a> |
-    <a href="{{ url_for('manager.edit_project', project_id=project.id) }}">Edit</a> |
-    <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Manage Skills</a> |
-    <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Find Employees</a> |
-    <a href="{{ url_for('manager.project_team', project_id=project.id) }}">View Team</a>
-</p>
+        <nav class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <a href="{{ url_for('manager.list_projects') }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Projects
+            </a>
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ url_for('manager.edit_project', project_id=project.id) }}"
+                    class="px-4 py-2 bg-surface border border-border-main rounded-xl text-sm font-bold text-text-main hover:border-primary-600 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">edit</span> Edit
+                </a>
+                <a href="{{ url_for('manager.project_skills', project_id=project.id) }}"
+                    class="px-4 py-2 bg-surface border border-border-main rounded-xl text-sm font-bold text-text-main hover:border-primary-600 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">psychology</span> Skills
+                </a>
+                <a href="{{ url_for('manager.match_employees', project_id=project.id) }}"
+                    class="px-4 py-2 bg-primary-700 text-text-inverse rounded-xl text-sm font-bold hover:bg-primary-800 transition-all flex items-center gap-2 shadow-md">
+                    <span class="material-symbols-outlined text-sm">person_add</span> Find Team
+                </a>
+            </div>
+        </nav>
 
-<table border="1" cellpadding="8">
-    <tr>
-        <td><strong>Status</strong></td>
-        <td>{{ project.status }}</td>
-    </tr>
-    <tr>
-        <td><strong>Description</strong></td>
-        <td>{{ project.description or 'No description' }}</td>
-    </tr>
-    <tr>
-        <td><strong>Start Date</strong></td>
-        <td>{{ project.start_date or 'Not set' }}</td>
-    </tr>
-    <tr>
-        <td><strong>End Date</strong></td>
-        <td>{{ project.end_date or 'Not set' }}</td>
-    </tr>
-    <tr>
-        <td><strong>Created</strong></td>
-        <td>{{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-    </tr>
-</table>
+        <header class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm relative overflow-hidden">
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest 
+                            {% if project.status == 'active' %} bg-success-50 text-success-800 
+                            {% elif project.status == 'planning' %} bg-info-50 text-info-800 
+                            {% else %} bg-background text-text-muted {% endif %}">
+                            {{ project.status }}
+                        </span>
+                        <span class="text-text-light text-xs font-bold uppercase tracking-tighter">Created {{
+                            project.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    <h1 class="text-4xl font-black text-text-main tracking-tight">{{ project.title }}</h1>
+                    <p class="text-text-muted text-lg leading-relaxed max-w-3xl">
+                        {{ project.description or 'No project description provided.' }}
+                    </p>
+                </div>
 
-<h2>Required Skills ({{ skill_requirements|length }})</h2>
-{% if skill_requirements %}
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Skill</th>
-        <th>Category</th>
-        <th>Mandatory</th>
-        <th>Min Level</th>
-    </tr>
-    {% for skill in skill_requirements %}
-    <tr>
-        <td>{{ skill.skill_name }}</td>
-        <td>{{ skill.category or '-' }}</td>
-        <td>{{ 'Yes' if skill.is_mandatory else 'No' }}</td>
-        <td>{{ skill.minimum_proficiency }}/5</td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No skill requirements defined. <a href="{{ url_for('manager.project_skills', project_id=project.id) }}">Add
-        skills</a></p>
-{% endif %}
+                <div class="bg-background rounded-2xl p-6 flex flex-col justify-center gap-4 border border-border-main">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black text-text-muted uppercase">Timeline</span>
+                        <span class="material-symbols-outlined text-primary-600 text-sm">calendar_month</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-text-main">Start: <span class="font-normal">{{
+                                project.start_date or 'TBD' }}</span></p>
+                        <p class="text-sm font-bold text-text-main">End: <span class="font-normal">{{ project.end_date
+                                or 'TBD' }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-<h2>Team Members ({{ team|length }})</h2>
-{% if team %}
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Department</th>
-        <th>Role in Project</th>
-        <th>Assigned</th>
-        <th>Actions</th>
-    </tr>
-    {% for member in team %}
-    <tr>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}">{{ member.username }}</a>
-        </td>
-        <td>{{ member.email }}</td>
-        <td>{{ member.department or '-' }}</td>
-        <td>{{ member.role_in_project or '-' }}</td>
-        <td>{{ member.allotted_date.strftime('%Y-%m-%d') if member.allotted_date else '-' }}</td>
-        <td>
-            <form method="POST"
-                action="{{ url_for('manager.unassign_employee', project_id=project.id, user_id=member.user_id) }}"
-                style="display: inline;">
-                <button type="submit" onclick="return confirm('Remove this employee?');">Remove</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No team members assigned. <a href="{{ url_for('manager.match_employees', project_id=project.id) }}">Find matching
-        employees</a></p>
-{% endif %}
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden flex flex-col">
+                <div class="px-8 py-5 border-b border-border-main flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-text-main">Required Skills ({{ skill_requirements|length }})</h2>
+                    <a href="{{ url_for('manager.project_skills', project_id=project.id) }}"
+                        class="text-xs font-black text-primary-700 hover:underline uppercase tracking-widest">Update
+                        Specs</a>
+                </div>
+
+                <div class="overflow-x-auto overflow-y-auto max-h-96 relative">
+                    <table class="w-full text-left border-separate border-spacing-0">
+                        <thead>
+                            <tr>
+                                {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main px-8
+                                py-4 text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                                <th class="{{ th_classes }}">Skill</th>
+                                <th class="{{ th_classes }}">Category</th>
+                                <th class="{{ th_classes }}">Priority</th>
+                                <th class="{{ th_classes }} text-right">Min Level</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-main">
+                            {% if skill_requirements %}
+                            {% for skill in skill_requirements %}
+                            <tr class="group hover:bg-background transition-colors duration-150">
+                                <td class="px-8 py-5 font-bold text-text-main">{{ skill.skill_name }}</td>
+                                <td class="px-8 py-5 text-sm text-text-muted">{{ skill.category or '-' }}</td>
+                                <td class="px-8 py-5">
+                                    <span
+                                        class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter {{ 'bg-danger-50 text-danger-800' if skill.is_mandatory else 'bg-primary-50 text-primary-700' }}">
+                                        {{ 'Mandatory' if skill.is_mandatory else 'Optional' }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 text-right font-black text-text-main">{{ skill.minimum_proficiency
+                                    }}/5</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-8 py-12 text-center text-text-muted italic">No requirements
+                                    defined.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="bg-surface rounded-2xl border border-border-main shadow-sm overflow-hidden flex flex-col">
+                <div class="px-8 py-5 border-b border-border-main flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-text-main">Team Roster ({{ team|length }})</h2>
+                    <a href="{{ url_for('manager.project_team', project_id=project.id) }}"
+                        class="text-xs font-black text-primary-700 hover:underline uppercase tracking-widest">Full
+                        Team</a>
+                </div>
+
+                <div class="overflow-x-auto overflow-y-auto max-h-96 relative">
+                    <table class="w-full text-left border-separate border-spacing-0">
+                        <thead>
+                            <tr>
+                                {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main px-8
+                                py-4 text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                                <th class="{{ th_classes }}">Member</th>
+                                <th class="{{ th_classes }}">Role</th>
+                                <th class="{{ th_classes }}">Assigned</th>
+                                <th class="{{ th_classes }} text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border-main">
+                            {% if team %}
+                            {% for member in team %}
+                            <tr class="group hover:bg-background transition-colors duration-150">
+                                <td class="px-8 py-5">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[10px] font-black">
+                                            {{ member.username[:2] | upper }}
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <a href="{{ url_for('manager.view_employee_skills', user_id=member.user_id) }}"
+                                                class="text-sm font-bold text-text-main hover:text-primary-700 transition-colors">{{
+                                                member.username }}</a>
+                                            <span class="text-[10px] text-text-muted">{{ member.department or 'General'
+                                                }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-sm font-medium text-text-main">{{ member.role_in_project or
+                                    'Staff' }}</td>
+                                <td class="px-8 py-5 text-xs text-text-muted">{{ member.allotted_date.strftime('%b %d,
+                                    %Y') if member.allotted_date else '-' }}</td>
+                                <td class="px-8 py-5 text-right">
+                                    <form method="POST"
+                                        action="{{ url_for('manager.unassign_employee', project_id=project.id, user_id=member.user_id) }}">
+                                        <button type="submit"
+                                            onclick="return confirm('Remove this employee from the team?');"
+                                            class="p-2 text-text-light hover:text-danger-800 hover:bg-danger-50 rounded-lg transition-all">
+                                            <span class="material-symbols-outlined text-sm">person_remove</span>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-8 py-12 text-center text-text-muted italic">No team members
+                                    assigned.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
 {% endblock %}

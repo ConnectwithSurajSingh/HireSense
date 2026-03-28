@@ -2,60 +2,128 @@
 {% block title %} – Employee Skills{% endblock %}
 
 {% block manager_content %}
-<h1>Employee Skills: {{ employee.username }}</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
 
-<p><a href="{{ url_for('manager.view_updates') }}">&larr; Back to Updates</a></p>
+        <nav>
+            <a href="{{ url_for('manager.view_updates') }}"
+                class="group flex items-center gap-2 text-text-muted hover:text-primary-700 font-bold transition-colors">
+                <span
+                    class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                Back to Updates
+            </a>
+        </nav>
 
-<table border="1" cellpadding="8">
-    <tr>
-        <td><strong>Username</strong></td>
-        <td>{{ employee.username }}</td>
-    </tr>
-    <tr>
-        <td><strong>Email</strong></td>
-        <td>{{ employee.email }}</td>
-    </tr>
-    <tr>
-        <td><strong>Department</strong></td>
-        <td>{{ employee.department.name if employee.department else '-' }}</td>
-    </tr>
-    <tr>
-        <td><strong>Job Title</strong></td>
-        <td>{{ employee.job_title or '-' }}</td>
-    </tr>
-</table>
+        <header
+            class="bg-surface p-8 rounded-2xl border border-border-main shadow-sm flex flex-col md:flex-row gap-8 items-center">
+            <div
+                class="w-24 h-24 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-3xl font-black border-4 border-background shadow-sm shrink-0">
+                {{ employee.username[:2] | upper }}
+            </div>
+            <div class="flex-1 text-center md:text-left space-y-2">
+                <h1 class="text-3xl font-black text-text-main tracking-tight">{{ employee.username }}</h1>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <span class="flex items-center gap-1 text-text-muted font-medium">
+                        <span class="material-symbols-outlined text-sm">mail</span> {{ employee.email }}
+                    </span>
+                    <span class="flex items-center gap-1 text-text-muted font-medium">
+                        <span class="material-symbols-outlined text-sm">badge</span> {{ employee.job_title or 'Employee'
+                        }}
+                    </span>
+                    <span class="flex items-center gap-1 text-primary-700 font-bold">
+                        <span class="material-symbols-outlined text-sm">corporate_fare</span> {{
+                        employee.department.name if employee.department else 'No Department' }}
+                    </span>
+                </div>
+            </div>
+        </header>
 
-<h2>Skills ({{ skills|length }})</h2>
-{% if skills %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Skill</th>
-        <th>Category</th>
-        <th>Proficiency</th>
-        <th>Verified</th>
-        <th>Actions</th>
-    </tr>
-    {% for skill in skills %}
-    <tr>
-        <td>{{ skill.skill_name }}</td>
-        <td>{{ skill.category or '-' }}</td>
-        <td>{{ skill.proficiency_level }}/5</td>
-        <td>{{ 'Yes' if skill.is_verified else 'No' }}</td>
-        <td>
-            {% if not skill.is_verified %}
-            <form method="POST" action="{{ url_for('manager.verify_employee_skill', user_id=employee.id) }}"
-                style="display: inline;">
-                <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
-                <button type="submit">Verify</button>
-            </form>
-            {% else %}
-            <em>Verified</em>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No skills recorded for this employee.</p>
-{% endif %}
+        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+            <div class="bg-surface px-8 py-5 border-b border-border-main flex justify-between items-center">
+                <h2 class="text-xl font-bold text-text-main">Skill Inventory ({{ skills|length }})</h2>
+            </div>
+
+            <div class="overflow-x-auto overflow-y-auto max-h-150 relative">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead>
+                        <tr>
+                            {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main px-8 py-4
+                            text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                            <th class="{{ th_classes }}">Skill Name</th>
+                            <th class="{{ th_classes }}">Category</th>
+                            <th class="{{ th_classes }}">Proficiency</th>
+                            <th class="{{ th_classes }} text-center">Status</th>
+                            <th class="{{ th_classes }} text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main">
+                        {% if skills %}
+                        {% for skill in skills %}
+                        <tr class="group hover:bg-background transition-colors duration-150">
+                            <td class="px-8 py-5">
+                                <span class="font-bold text-text-main">{{ skill.skill_name }}</span>
+                            </td>
+                            <td class="px-8 py-5 text-sm text-text-muted font-medium">
+                                {{ skill.category or '-' }}
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex gap-0.5">
+                                        {% for i in range(1, 6) %}
+                                        <div
+                                            class="w-1.5 h-3 rounded-full {{ 'bg-primary-600' if i <= skill.proficiency_level else 'bg-text-light/20' }}">
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-sm font-black text-text-main">{{ skill.proficiency_level
+                                        }}/5</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 text-center">
+                                {% if skill.is_verified %}
+                                <span
+                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-success-50 text-success-800 text-[10px] font-black uppercase">
+                                    <span class="material-symbols-outlined text-xs">verified</span> Verified
+                                </span>
+                                {% else %}
+                                <span
+                                    class="text-[10px] font-bold text-text-light uppercase tracking-widest">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                {% if not skill.is_verified %}
+                                <form method="POST"
+                                    action="{{ url_for('manager.verify_employee_skill', user_id=employee.id) }}">
+                                    <input type="hidden" name="skill_id" value="{{ skill.skill_id }}">
+                                    <button type="submit"
+                                        class="px-4 py-1.5 bg-primary-700 text-text-inverse rounded-lg text-xs font-black hover:bg-primary-800 transition-all shadow-sm active:scale-95">
+                                        Verify Skill
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="material-symbols-outlined text-primary-600"
+                                    title="Endorsed">check_circle</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-16 text-center text-text-muted">
+                                <span class="material-symbols-outlined text-4xl mb-2 opacity-20">history_edu</span>
+                                <p class="font-medium">No skills recorded for this employee.</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="px-8 py-4 bg-background border-t border-border-main">
+                <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Verification helps improve
+                    project matching accuracy.</p>
+            </footer>
+        </section>
+    </div>
+</div>
 {% endblock %}

@@ -2,55 +2,201 @@
 {% block title %} – Recent Updates{% endblock %}
 
 {% block manager_content %}
-<h1>Recent Updates</h1>
+<div class="flex flex-col gap-8 px-6 pb-12 bg-background min-h-screen">
+    <div class="w-full space-y-8">
+        <header>
+            <h1 class="text-3xl font-black font-headline text-text-main tracking-wide">Recent Updates</h1>
+            <p class="text-text-muted">Real-time feed of employee skill advancements and profile changes.</p>
+        </header>
 
-<h2>Skill Updates</h2>
-{% if skill_updates %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Employee</th>
-        <th>Skill</th>
-        <th>Level</th>
-        <th>Verified</th>
-        <th>Updated</th>
-        <th>Actions</th>
-    </tr>
-    {% for update in skill_updates %}
-    <tr>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}">{{ update.username }}</a>
-        </td>
-        <td>{{ update.skill_name }}</td>
-        <td>{{ update.proficiency_level }}/5</td>
-        <td>{{ 'Yes' if update.is_verified else 'No' }}</td>
-        <td>{{ update.updated_at.strftime('%Y-%m-%d %H:%M') if update.updated_at else '-' }}</td>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}">View Profile</a></td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No recent skill updates.</p>
-{% endif %}
+        <section class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex bg-surface p-1 rounded-xl w-fit border border-border-main">
+                <button
+                    class="px-6 py-2 text-sm font-semibold bg-primary-700 text-text-inverse shadow-sm rounded-lg transition-all">All</button>
+                <button
+                    class="px-6 py-2 text-sm font-medium text-text-muted hover:text-primary-600 transition-colors">Skill
+                    Updates</button>
+                <button
+                    class="px-6 py-2 text-sm font-medium text-text-muted hover:text-primary-600 transition-colors">Resumes</button>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">search</span>
+                    <input
+                        class="pl-10 pr-4 py-2 bg-surface border border-border-main rounded-lg text-sm w-64 focus:ring-primary-600 focus:ring-2 transition-all outline-none text-text-main"
+                        placeholder="Search updates..." type="text" />
+                </div>
+            </div>
+        </section>
 
-<h2>Resume Updates</h2>
-{% if resume_updates %}
-<table border="1" cellpadding="8" style="width: 100%;">
-    <tr>
-        <th>Employee</th>
-        <th>File</th>
-        <th>Updated</th>
-        <th>Actions</th>
-    </tr>
-    {% for update in resume_updates %}
-    <tr>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}">{{ update.username }}</a>
-        </td>
-        <td>{{ update.original_filename or 'Resume' }}</td>
-        <td>{{ update.last_updated.strftime('%Y-%m-%d %H:%M') if update.last_updated else '-' }}</td>
-        <td><a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}">View Skills</a></td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>No recent resume updates.</p>
-{% endif %}
+        <section class="bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
+            <div class="bg-surface px-8 py-5 border-b border-border-main">
+                <h2 class="text-xl font-bold text-text-main">Activity Log</h2>
+            </div>
+
+            <div class="max-h-130 overflow-y-auto overflow-x-auto relative">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead>
+                        <tr>
+                            {% set th_classes = "sticky top-0 z-10 bg-background border-b border-border-main px-8 py-5
+                            text-xs font-bold uppercase tracking-wider text-text-muted" %}
+                            <th class="{{ th_classes }}">Timestamp</th>
+                            <th class="{{ th_classes }}">Category</th>
+                            <th class="{{ th_classes }}">Details</th>
+                            <th class="{{ th_classes }}">Status / Info</th>
+                            <th class="{{ th_classes }} text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border-main">
+
+                        {# --- SKILL UPDATES --- #}
+                        {% if skill_updates %}
+                        {% for update in skill_updates %}
+                        <tr class="group hover:bg-background transition-colors duration-150">
+                            <td class="px-8 py-6 whitespace-nowrap">
+                                <p class="text-sm font-semibold text-text-main">
+                                    {{ update.updated_at.strftime('%b %d, %I:%M %p') if update.updated_at else
+                                    'Recently' }}
+                                </p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700">
+                                        <span class="material-symbols-outlined text-xl">psychology</span>
+                                    </div>
+                                    <span class="text-sm font-medium text-text-main">Skill Update</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-primary-200 flex items-center justify-center text-primary-800 font-bold text-xs uppercase">
+                                        {{ update.username[:2] }}
+                                    </div>
+                                    <p class="text-sm text-text-muted leading-relaxed">
+                                        <span class="font-bold text-text-main">{{ update.username }}</span> updated
+                                        <span class="font-bold text-text-main">{{ update.skill_name }}</span>
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="px-2 py-0.5 bg-primary-100 text-primary-700 rounded text-xs font-bold">
+                                        Level {{ update.proficiency_level }}/5
+                                    </span>
+                                    {% if update.is_verified %}
+                                    <span class="material-symbols-outlined text-primary-600 text-sm"
+                                        title="Verified">verified</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}"
+                                    class="text-primary-700 font-bold text-sm hover:text-primary-900 transition-colors">View Profile</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+
+                        {# --- RESUME UPDATES --- #}
+                        {% if resume_updates %}
+                        {% for update in resume_updates %}
+                        <tr class="group hover:bg-primary-50 transition-colors duration-150">
+                            <td class="px-8 py-6 whitespace-nowrap">
+                                <p class="text-sm font-semibold text-text-main">
+                                    {{ update.last_updated.strftime('%b %d, %I:%M %p') if update.last_updated else
+                                    'Recently' }}
+                                </p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-600">
+                                        <span class="material-symbols-outlined text-xl">description</span>
+                                    </div>
+                                    <span class="text-sm font-medium text-text-main">Resume Upload</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm text-text-muted leading-relaxed">
+                                    <span class="font-bold text-text-main">{{ update.username }}</span> uploaded
+                                    <span class="italic font-medium text-text-main">{{ update.original_filename or
+                                        'resume_file.pdf' }}</span>
+                                </p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="text-xs font-medium text-primary-700 bg-primary-50 px-2 py-0.5 rounded uppercase tracking-tighter">Parsed</span>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <a href="{{ url_for('manager.view_employee_skills', user_id=update.user_id) }}"
+                                    class="text-primary-700 font-bold text-sm hover:text-primary-900 transition-colors">View Skills</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if not skill_updates and not resume_updates %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-12 text-center text-text-muted bg-surface">
+                                <span class="material-symbols-outlined text-4xl mb-2">history</span>
+                                <p>No recent activity detected.</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="px-8 py-4 bg-background flex items-center justify-between border-t border-border-main">
+                <p class="text-xs font-medium text-text-muted">
+                    Showing {{ (skill_updates|length if skill_updates else 0) + (resume_updates|length if resume_updates
+                    else 0) }} updates
+                </p>
+            </footer>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-12">
+            <div
+                class="md:col-span-2 bg-primary-700 p-8 rounded-2xl relative overflow-hidden group shadow-lg shadow-primary-900/10">
+                <div class="relative z-10 text-text-inverse">
+                    <h3 class="font-headline text-xl font-bold mb-2">Weekly Summary</h3>
+                    <p class="text-text-inverse/80 text-sm max-w-md font-medium">
+                        HireSense has processed all recent employee changes. Keep profiles updated to ensure accurate
+                        project matching.
+                    </p>
+                    <button
+                        class="mt-6 px-6 py-2 bg-surface text-primary-700 rounded-xl text-sm font-black hover:bg-primary-50 transition-all">
+                        Download Weekly Report
+                    </button>
+                </div>
+                <span
+                    class="material-symbols-outlined absolute -bottom-6 -right-6 text-[10rem] text-text-inverse/10 opacity-50 group-hover:scale-110 transition-transform duration-500">monitoring</span>
+            </div>
+
+            <div class="bg-surface p-6 rounded-2xl border border-border-main shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-text-main font-bold">Alert Settings</h3>
+                        <span class="material-symbols-outlined text-text-muted">settings</span>
+                    </div>
+                    <p class="text-xs text-text-muted mb-6">Receive real-time notifications for team skill advancements.
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between text-sm font-bold text-text-main">
+                        <span>Email Alerts</span>
+                        <span class="text-primary-700">Active</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm font-bold text-text-main">
+                        <span>Browser Alerts</span>
+                        <span class="text-text-muted">Disabled</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 {% endblock %}

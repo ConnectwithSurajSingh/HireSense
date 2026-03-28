@@ -21,9 +21,10 @@ def create_app(port: int = 5010) -> Flask:
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    from utility.seed_users import seed_users, seed_data
+    from utility.seed_users import seed_users, seed_data, seed_manager_data
     app.cli.add_command(seed_users)
     app.cli.add_command(seed_data)
+    app.cli.add_command(seed_manager_data)
 
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
