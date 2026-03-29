@@ -55,7 +55,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "DATABASE_URL=postgresql://hiresense_test:test_password@postgres:5432/hiresense_test" >> $GITHUB_ENV
+          echo "DATABASE_URL=postgresql://hiresense_test:test_password@localhost:5432/hiresense_test" >> $GITHUB_ENV
           echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
           echo "ADMIN_PASSWORD=TestAdmin@123" >> $GITHUB_ENV
           echo "FLASK_DEBUG=false" >> $GITHUB_ENV

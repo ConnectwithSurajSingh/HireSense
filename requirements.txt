@@ -53,8 +53,8 @@ torch==2.11.0
 transformers==5.4.0
 
 # spaCy models
-en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl#sha256=293e9547a655b2549919198ab15a525b05b94075f1025e405e8c385433297ab63
-en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl#sha256=5e6329fe3fecedbd1d1a02c3e2172ee0f6dec6cea6e4aefb6a02d832dba78a310
+en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl
+en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
 
 # NLP/ML support libraries
 annotated-doc==0.0.4
@@ -136,8 +136,8 @@ pytest-mock==3.14.0
 sphinx>=7.0
 myst-parser>=2.0
 sphinx-autodoc-typehints>=2.0
-# shibuya  # Modern Sphinx theme (uncomment when available)
-# sphinx-rtd-theme>=2.0  # Fallback theme
+sphinx-rtd-theme>=2.0
+shibuya  # Modern Sphinx theme (uncomment when available)
 
 # Build and Packaging
 packaging==26.0
