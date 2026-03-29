@@ -68,7 +68,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=app --cov-report=term-missing --cov-report=xml:testing/coverage.xml --cov-report=html:testing/coverage_html --cov-fail-under=85 -v 2>&1 | tee pytest.log
+          pytest --cov=app --cov-report=term-missing --cov-report=xml:testing/coverage.xml --cov-report=html:testing/coverage_html --junitxml=testing/junit.xml --cov-fail-under=85 -v 2>&1 | tee pytest.log
 
       - name: Check coverage threshold
         run: |
@@ -99,6 +99,7 @@ jobs:
           name: test-results-${{ matrix.python-version }}
           path: |
             testing/coverage.xml
+            testing/junit.xml
             pytest.log
           retention-days: 30
 
@@ -129,7 +130,7 @@ jobs:
         if: always()
         with:
           files: |
-            testing/coverage.xml
+            testing/junit.xml
         continue-on-error: true
 
   coverage-gate:
