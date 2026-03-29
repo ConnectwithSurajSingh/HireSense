@@ -22,7 +22,7 @@ def create_app(port: int = 5010) -> Flask:
     """
     app = Flask(__name__)
 
-    # Import CLI command from utility package at project root
+                                                             
     import sys
     import os
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

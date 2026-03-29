@@ -1,26 +1,28 @@
-name: Build and Deploy Sphinx Documentation
+name: Build and Deploy Documentation
 
 on:
   push:
     branches:
       - main
       - master
-      - develop
     paths:
       - 'app/**'
       - 'docs/**'
+      - 'testing/**'
+      - 'utility/**'
       - 'requirements.txt'
       - '.github/workflows/docs.yml'
   pull_request:
     branches:
       - main
       - master
-      - develop
     paths:
       - 'app/**'
       - 'docs/**'
+      - 'testing/**'
+      - 'utility/**'
       - 'requirements.txt'
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -36,46 +38,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential
+          sudo apt-get install -y build-essential libpq-dev
 
-      - name: Install Python dependencies
+      - name: Install documentation dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
-          pip install -r requirements.txt || pip install flask flask-sqlalchemy flask-login flask-migrate
+          pip install sphinx myst-parser sphinx-autodoc-typehints
+          pip install sphinx-rtd-theme || true
+          pip install shibuya || true
+          pip install flask flask-sqlalchemy flask-login flask-migrate werkzeug
 
-      - name: Download spaCy model (for documentation build)
+      - name: Download spaCy model (optional)
         run: |
+          pip install spacy || true
           python -m spacy download en_core_web_sm || true
+        continue-on-error: true
 
       - name: Build Sphinx documentation
         run: |
           cd docs
-          sphinx-build -b html -W --keep-going . _build/html
-        continue-on-error: true
-
-      - name: Check if documentation was built
-        run: |
-          if [ -d "docs/_build/html" ]; then
+          sphinx-build -b html -W --keep-going . _build/html 2>&1 | tee build.log || true
+          # Check if index.html was created
+          if [ -f "_build/html/index.html" ]; then
             echo "Documentation built successfully"
-            ls -la docs/_build/html/
           else
-            echo "Documentation build failed"
-            exit 1
+            echo "Warning: index.html not found, attempting permissive build"
+            sphinx-build -b html . _build/html
           fi
+
+      - name: Verify build output
+        run: |
+          echo "Build artifacts:"
+          ls -la docs/_build/html/ || echo "Build directory not found"
 
   deploy:
     needs: build
@@ -87,34 +94,41 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
-          pip install -r requirements.txt || pip install flask flask-sqlalchemy flask-login flask-migrate
+          pip install sphinx myst-parser sphinx-autodoc-typehints
+          pip install sphinx-rtd-theme || true
+          pip install shibuya || true
+          pip install flask flask-sqlalchemy flask-login flask-migrate werkzeug
 
       - name: Download spaCy model
         run: |
+          pip install spacy || true
           python -m spacy download en_core_web_sm || true
+        continue-on-error: true
 
       - name: Build documentation
         run: |
           cd docs
           sphinx-build -b html . _build/html
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Upload artifacts to GitHub Pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: docs/_build/html
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4

@@ -34,9 +34,9 @@ class DocumentParser:
     can degrade gracefully without try/except at every call site.
     """
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
+                                                                        
+                
+                                                                        
 
     @classmethod
     def parse_file(cls, file_path: str) -> str:
@@ -138,9 +138,9 @@ class DocumentParser:
             logger.exception("Failed to parse DOCX '%s'.", file_path)
             raise ValueError(f"Could not parse DOCX file: {exc}") from exc
 
-    # ------------------------------------------------------------------
-    # Utility
-    # ------------------------------------------------------------------
+                                                                        
+             
+                                                                        
 
     @staticmethod
     def is_supported(filename: str) -> bool:
@@ -161,7 +161,7 @@ class DocumentParser:
         :returns: Cleaned text.
         :rtype: str
         """
-        import unicodedata  # stdlib – always available
+        import unicodedata                             
 
         lines: list[str] = []
         prev_blank = False
@@ -183,9 +183,9 @@ class DocumentParser:
 
         return "\n".join(lines).strip()
 
-    # ------------------------------------------------------------------
-    # Private helpers
-    # ------------------------------------------------------------------
+                                                                        
+                     
+                                                                        
 
     @staticmethod
     def _parse_pdf_pdfplumber(file_path: str) -> str:
